@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import Nhom100.DoAnJ2EE.model.Course;
+import Nhom100.DoAnJ2EE.entity.Course;
 
 @Service
 
