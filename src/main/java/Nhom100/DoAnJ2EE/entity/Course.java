@@ -2,6 +2,8 @@ package Nhom100.DoAnJ2EE.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Data
 @Entity
@@ -13,9 +15,21 @@ public class Course {
 
     private String name;
     private String title;
+    
+    @Column(columnDefinition = "TEXT")
     private String description;
+    
+    @Column(columnDefinition = "TEXT")
     private String image;
     private Double price;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    @JsonIgnore
+    private Category category;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    private List<Chapter> chapters;
 
     public Course() {}
 
