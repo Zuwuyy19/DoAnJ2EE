@@ -11,11 +11,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import Nhom100.DoAnJ2EE.service.CustomUserDetailsService;
 
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+
 /**
  * Cấu hình Spring Security cho toàn bộ ứng dụng
  * @Configuration: Đánh dấu đây là class cấu hình Spring, được load khi ứng dụng khởi động
  */
 @Configuration   // Đánh dấu đây là class cấu hình Spring
+@EnableMethodSecurity // Kích hoạt Method Security (@PreAuthorize, v.v...)
 public class SecurityConfig {
 
     // Inject JwtAuthenticationFilter - filter xử lý JWT authentication cho REST API
@@ -69,6 +72,10 @@ public class SecurityConfig {
                         "/swagger-ui/**",              // Swagger UI
                         "/v3/api-docs/**"             // OpenAPI JSON
                 ).permitAll()   // Cho phép tất cả mọi người truy cập
+
+                // 🚀 Endpoints dành riêng cho Admin (Trang web):
+                // Chỉ user có "ROLE_ADMIN" mới được vào các URL bắt đầu bằng /admin
+                .requestMatchers("/admin/**").hasRole("ADMIN")
 
                 // 🔐 REST API endpoints - CẦN xác thực bằng JWT:
                 // Tất cả request bắt đầu bằng "/api/" đều yêu cầu authentication
