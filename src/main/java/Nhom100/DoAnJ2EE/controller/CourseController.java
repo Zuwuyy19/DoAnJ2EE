@@ -3,12 +3,13 @@ package Nhom100.DoAnJ2EE.controller;
 import Nhom100.DoAnJ2EE.entity.Course;
 import Nhom100.DoAnJ2EE.repository.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/courses")
+@RequestMapping("/api/courses")
 public class CourseController {
 
     @Autowired
@@ -27,12 +28,14 @@ public class CourseController {
     }
 
     // ✅ Thêm khóa học
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public Course createCourse(@RequestBody Course course) {
         return courseRepository.save(course);
     }
 
     // ✅ Cập nhật khóa học
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public Course updateCourse(@PathVariable Long id, @RequestBody Course newCourse) {
 
@@ -52,6 +55,7 @@ public class CourseController {
     }
 
     // ✅ Xóa khóa học
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public String deleteCourse(@PathVariable Long id) {
         courseRepository.deleteById(id);
