@@ -1,17 +1,5 @@
 package Nhom100.DoAnJ2EE.controller;
 
-<<<<<<< HEAD
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-@Controller
-public class AdminController {
-
-    @GetMapping("/admin/dashboard")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String adminPage() {
-        return "admindashboard";
-=======
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -110,6 +98,6 @@ public class AdminController {
         // Lưu ý: Nếu danh mục có khóa học, hibernate sẽ báo lỗi hoặc xóa cascade tùy config
         categoryRepository.deleteById(id);
         return "redirect:/admin/categories";
->>>>>>> main
+
     }
 }
