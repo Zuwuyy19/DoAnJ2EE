@@ -15,6 +15,9 @@
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="/">Trang chủ</a></li>
                 <li class="nav-item"><a class="nav-link active" href="/courses">Khóa học</a></li>
+                <li class="nav-item" th:if="${isLogged}"><a class="nav-link" href="/cart">Giỏ hàng</a></li>
+                <li class="nav-item" th:if="${isLogged}"><a class="nav-link" href="/orders/history">Lịch sử</a></li>
+                
                 <li class="nav-item" th:if="${!isLogged}"><a class="nav-link" href="/login">Đăng nhập</a></li>
                 <li class="nav-item" th:if="${!isLogged}"><a class="nav-link" href="/register">Đăng ký</a></li>
                 <li class="nav-item" th:if="${isAdmin}"><a class="nav-link text-warning fw-bold" href="/admin">⚡ Quản trị</a></li>
