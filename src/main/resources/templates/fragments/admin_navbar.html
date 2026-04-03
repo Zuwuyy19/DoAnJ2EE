@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
 </head>
+
 <body>
-    <nav th:fragment="admin_navbar(activePage)" class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top py-3">
+    <nav th:fragment="admin_navbar(activePage)"
+        class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top py-3">
         <div class="container">
             <a class="navbar-brand fw-bold text-primary fs-4 d-flex align-items-center gap-2" href="/admin">
                 <span>👑</span> Admin Panel
@@ -15,24 +18,37 @@
             <div class="collapse navbar-collapse" id="adminNav">
                 <ul class="navbar-nav ms-auto align-items-center gap-2">
                     <li class="nav-item">
-                        <a class="nav-link px-3 fw-semibold" th:classappend="${activePage == 'dashboard' ? 'active text-primary' : ''}" href="/admin">Dashboard</a>
+                        <a class="nav-link px-3 fw-semibold"
+                            th:classappend="${activePage == 'dashboard' ? 'active text-primary' : ''}"
+                            href="/admin">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link px-3 fw-semibold" th:classappend="${activePage == 'courses' ? 'active text-primary' : ''}" href="/admin/courses">Khóa học</a>
+                        <a class="nav-link px-3 fw-semibold"
+                            th:classappend="${activePage == 'courses' ? 'active text-primary' : ''}"
+                            href="/admin/courses">Khóa học</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link px-3 fw-semibold" th:classappend="${activePage == 'categories' ? 'active text-primary' : ''}" href="/admin/categories">Danh mục</a>
+                        <a class="nav-link px-3 fw-semibold"
+                            th:classappend="${activePage == 'categories' ? 'active text-primary' : ''}"
+                            href="/admin/categories">Danh mục</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link px-3 fw-semibold" th:classappend="${activePage == 'users' ? 'active text-primary' : ''}" href="/admin/users">Người dùng</a>
+                        <a class="nav-link px-3 fw-semibold"
+                            th:classappend="${activePage == 'purchased' ? 'active text-primary' : ''}"
+                            href="/admin/purchased-courses">Nội dung</a>
                     </li>
-                    
+                    <li class="nav-item">
+                        <a class="nav-link px-3 fw-semibold"
+                            th:classappend="${activePage == 'users' ? 'active text-primary' : ''}"
+                            href="/admin/users">Người dùng</a>
+                    </li>
+
                     <li class="nav-item ms-lg-3">
                         <a class="btn btn-outline-primary rounded-pill px-4 fw-bold shadow-sm" href="/">
                             <i class="bi bi-house-door me-1"></i> Trang chủ
                         </a>
                     </li>
-                    
+
                     <li class="nav-item">
                         <form th:action="@{/logout}" method="post" class="m-0">
                             <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm ms-lg-2">
@@ -45,4 +61,5 @@
         </div>
     </nav>
 </body>
+
 </html>

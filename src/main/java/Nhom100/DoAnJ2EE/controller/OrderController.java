@@ -71,7 +71,7 @@ public class OrderController {
 
             // Bước 2: Tra cứu user trong DB theo email lấy được từ token
             // Lấy userId thực tế từ database để đảm bảo user tồn tại và lấy đúng ID
-            User user = userRepository.findByEmail(email);
+            User user = userRepository.findByEmail(email).orElse(null);
 
             // Bước 3: Kiểm tra user có tồn tại trong DB không
             // Nếu không tìm thấy → trả về lỗi 401 Unauthorized
@@ -144,7 +144,7 @@ public class OrderController {
 
             // Bước 2: Tra cứu user trong DB theo email
             // Lấy user entity để có userId thực tế
-            User user = userRepository.findByEmail(email);
+            User user = userRepository.findByEmail(email).orElse(null);
 
             // Bước 3: Kiểm tra user tồn tại trong DB
             // Nếu không tìm thấy → trả về lỗi 401 Unauthorized

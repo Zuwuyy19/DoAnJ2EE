@@ -66,7 +66,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // Bước 5: Tra cứu user trong DB theo email lấy được từ token
             // Dùng userRepository để đảm bảo user tồn tại trong hệ thống
-            User user = userRepository.findByEmail(email);
+            User user = userRepository.findByEmail(email).orElse(null);
 
             // Bước 6: Nếu user tồn tại → tạo đối tượng Authentication và đăng ký vào SecurityContext
             // SecurityContext là nơi lưu trữ thông tin user đã xác thực cho request hiện tại

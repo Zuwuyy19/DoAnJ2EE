@@ -181,6 +181,11 @@
             <h2 class="section-title">Giới thiệu khóa học</h2>
             <div class="course-desc mb-4">
                 <p th:text="${course.description}">Mô tả chi tiết</p>
+                <div class="mt-3" th:if="${course.purchasedDetail != null and !#strings.isEmpty(course.purchasedDetail)}"
+                     th:text="${course.purchasedDetail}">Chi tiết khóa học</div>
+                <div class="mt-3" th:if="${course.videoUrl != null and !#strings.isEmpty(course.videoUrl)}">
+                    Video: <a th:href="${course.videoUrl}" target="_blank">Xem video</a>
+                </div>
             </div>
 
             <!-- Nội dung chương -->
@@ -188,34 +193,29 @@
 
             <div th:if="${#lists.isEmpty(course.chapters)}" class="alert alert-light border text-center py-4 rounded-3">
                 <i class="bi bi-inbox fs-1 text-muted d-block mb-2"></i>
-                <span class="text-muted">Khóa học đang được cập nhật nội dung...</span>
+                <span class="text-muted">Khóa học đang cập nhật nội dung....</span>
             </div>
 
             <div class="chapter-card" th:each="chapter, chStat : ${course.chapters}" th:classappend="${chStat.index == 0} ? 'open'">
-                <div class="chapter-header" th:onclick="toggleChapter(this)">
+                <div class="chapter-header" th:onclick="(isPurchased || isAdmin) ? toggleChapter(this) : null">
                     <div>
                         <div class="ch-title">
                             <i class="bi bi-folder2-open me-2 text-warning"></i>
                             Chương [[${chStat.count}]]: [[${chapter.title}]]
                         </div>
-                        <div class="ch-meta mt-1">
-                            <span th:text="${chapter.lessons?.size() ?: 0}">0</span> bài giảng
+                        <div class="ch-meta mt-1" th:if="${isPurchased || isAdmin}">
+                            <span th:text="${chapter.lessons?.size() ?: 0}">0</span> Bài giảng
                         </div>
                     </div>
-                    <i class="bi bi-chevron-down ch-toggle"></i>
+                    <i class="bi bi-chevron-down ch-toggle" th:if="${isPurchased || isAdmin}"></i>
                 </div>
-                <div class="lesson-wrapper" th:style="${chStat.index == 0} ? 'display:block' : 'display:none'">
+                <div class="lesson-wrapper" th:if="${isPurchased || isAdmin}" th:style="${chStat.index == 0} ? 'display:block' : 'display:none'">
                     <ul class="lesson-list">
                         <li th:if="${#lists.isEmpty(chapter.lessons)}" class="text-muted small py-2">Chưa có bài giảng</li>
                         <li class="lesson-item" th:each="lesson : ${chapter.lessons}">
                             <i class="bi bi-play-circle lesson-icon"></i>
                             <span class="lesson-title" th:text="${lesson.title}">Tên bài học</span>
-                            <button class="btn-trial"
-                                    th:if="${isPurchased || isAdmin}"
-                                    th:onclick="'playLesson(' + ${lesson.id} + ')'">
-                                Xem
-                            </button>
-                            <button class="btn-trial" th:if="${!isPurchased && !isAdmin}" disabled>🔒</button>
+                            <button class="btn-trial" th:if="${isPurchased || isAdmin}" th:onclick="'playLesson(' + ${lesson.id} + ')'">Xem</button>
                         </li>
                     </ul>
                 </div>
@@ -320,6 +320,7 @@
         </div><!-- /col-lg-4 -->
 
     </div><!-- /row -->
+            </div>
 </div><!-- /container -->
 
 <!-- JAVASCRIPT -->
