@@ -10,6 +10,7 @@ import Nhom100.DoAnJ2EE.entity.Course;
 import Nhom100.DoAnJ2EE.entity.Category;
 import Nhom100.DoAnJ2EE.service.CourseService;
 import Nhom100.DoAnJ2EE.repository.CategoryRepository;
+import Nhom100.DoAnJ2EE.repository.UserRepository;
 
 @Controller
 @RequestMapping("/admin")
@@ -22,11 +23,15 @@ public class AdminController {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @GetMapping
     public String adminDashboard(Model model) {
         model.addAttribute("courseCount", courseService.getAllCourses().size());
         model.addAttribute("categoryCount", categoryRepository.count());
-        return "admin/admin"; 
+        model.addAttribute("userCount", userRepository.count());
+        return "admin/admin";
     }
 
     // --- QUẢN LÝ KHÓA HỌC ---
