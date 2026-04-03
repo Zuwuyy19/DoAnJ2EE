@@ -18,10 +18,25 @@ public class Course {
     
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(columnDefinition = "TEXT")
+    private String purchasedDetail;
+
+    @Column(columnDefinition = "TEXT")
+    private String purchasedVideoUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String purchasedDocUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String purchasedPptUrl;
     
     @Column(columnDefinition = "TEXT")
     private String image;
     private Double price;
+
+    @Column(columnDefinition = "TEXT")
+    private String videoUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")

@@ -14,6 +14,12 @@ public class Chapter {
 
     private String title;
 
+    @Column(columnDefinition = "TEXT")
+    private String contentVideoUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String contentPptUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
     @JsonIgnore

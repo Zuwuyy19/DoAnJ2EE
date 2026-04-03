@@ -26,7 +26,7 @@
                     <span th:text="${course.id == null ? '➕ Thêm khóa học mới' : '📝 Chỉnh sửa khóa học'}"></span>
                 </div>
                 <div class="card-body p-4">
-                    <form th:action="@{/admin/courses/save}" th:object="${course}" method="POST">
+                    <form th:action="@{/admin/courses/save}" th:object="${course}" method="POST" enctype="multipart/form-data">
                         <input type="hidden" th:field="*{id}">
 
                         <div class="mb-3">
@@ -55,6 +55,14 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Đường dẫn ảnh (Image URL)</label>
                                 <input type="text" th:field="*{image}" class="form-control" placeholder="VD: https://..." required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Video giới thiệu khóa học (Upload)</label>
+                            <input type="file" name="courseVideoFile" class="form-control" accept="video/*">
+                            <div class="form-text" th:if="${course.videoUrl != null and !#strings.isEmpty(course.videoUrl)}">
+                                Hiện tại: <a th:href="${course.videoUrl}" target="_blank">Xem video</a>
                             </div>
                         </div>
 
