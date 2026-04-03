@@ -19,6 +19,9 @@
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="/">Trang chủ</a></li>
                 <li class="nav-item"><a class="nav-link active" href="/courses">Khóa học</a></li>
+                <li class="nav-item" th:if="${isLogged}"><a class="nav-link" href="/cart">Giỏ hàng</a></li>
+                <li class="nav-item" th:if="${isLogged}"><a class="nav-link" href="/orders/history">Lịch sử</a></li>
+
                 <li class="nav-item" th:if="${!isLogged}"><a class="nav-link" href="/login">Đăng nhập</a></li>
                 <li class="nav-item" th:if="${!isLogged}"><a class="nav-link" href="/register">Đăng ký</a></li>
                 <li class="nav-item" th:if="${isAdmin}"><a class="nav-link text-warning fw-bold" href="/admin">⚡ Quản trị</a></li>
@@ -31,6 +34,17 @@
         </div>
     </div>
 </nav>
+
+<div class="container mt-4">
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+</div>
 
 <div class="container mt-5">
     <div class="row">
@@ -76,7 +90,17 @@
             <div class="card shadow border-0 position-sticky" style="top: 20px;">
                 <div class="card-body text-center p-4">
                     <h1 class="text-danger fw-black mb-3 display-5 fw-bold" th:text="${course.price} + ' $'"></h1>
-                    <button class="btn btn-danger btn-lg w-100 mb-3 fw-bold rounded-pill shadow-sm"> Đăng ký học ngay </button>
+                    
+                    <!-- Form mua/thêm giỏ hàng -->
+                    <div th:if="${!isPurchased}">
+                        <form th:action="@{'/cart/add/' + ${course.id}}" method="post">
+                            <button type="submit" class="btn btn-danger btn-lg w-100 mb-3 fw-bold rounded-pill shadow-sm">Thêm vào giỏ hàng</button>
+                        </form>
+                    </div>
+                    <div th:if="${isPurchased}">
+                        <button class="btn btn-success btn-lg w-100 mb-3 fw-bold rounded-pill shadow-sm">Vào học ngay</button>
+                    </div>
+
                     <hr>
                     <ul class="text-start list-unstyled text-muted lh-lg">
                         <li>✅ Truy cập trọn đời</li>
