@@ -25,4 +25,6 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
+
+    private boolean enabled = true; // Thêm trường cho phép/khóa tài khoản
 }
