@@ -35,12 +35,18 @@ public class CartWebController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = false;
         boolean isLogged = user != null;
+        String userDisplayName = null;
+        String userHandle = null;
         if (isLogged) {
             isAdmin = auth.getAuthorities().stream()
                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            userDisplayName = auth.getName();
+            userHandle = "@" + auth.getName();
         }
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("isLogged", isLogged);
+        model.addAttribute("userDisplayName", userDisplayName);
+        model.addAttribute("userHandle", userHandle);
     }
 
     @GetMapping

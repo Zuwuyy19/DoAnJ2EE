@@ -98,5 +98,6 @@ public class AdminController {
         // Lưu ý: Nếu danh mục có khóa học, hibernate sẽ báo lỗi hoặc xóa cascade tùy config
         categoryRepository.deleteById(id);
         return "redirect:/admin/categories";
+
     }
 }
