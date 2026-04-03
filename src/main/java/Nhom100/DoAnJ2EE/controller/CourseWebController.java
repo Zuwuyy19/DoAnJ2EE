@@ -20,6 +20,22 @@ public class CourseWebController {
     @Autowired
     private CategoryRepository categoryRepository;
     
+    @Autowired
+    private Nhom100.DoAnJ2EE.repository.OrderDetailRepository orderDetailRepository;
+
+    @Autowired
+    private Nhom100.DoAnJ2EE.repository.UserRepository userRepository;
+
+    private Long getAuthenticatedUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
+            String email = auth.getName();
+            Nhom100.DoAnJ2EE.entity.User user = userRepository.findByEmail(email);
+            return user != null ? user.getId() : null;
+        }
+        return null;
+    }
+
     private void addAuthAttributes(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = false;
@@ -47,7 +63,14 @@ public class CourseWebController {
         Course course = courseRepository.findById(id).orElse(null);
         if(course == null) return "redirect:/courses";
         
+        Long userId = getAuthenticatedUserId();
+        boolean isPurchased = false;
+        if (userId != null) {
+            isPurchased = orderDetailRepository.existsByOrderUserIdAndCourseId(userId, id);
+        }
+        
         model.addAttribute("course", course);
+        model.addAttribute("isPurchased", isPurchased);
         return "course/detail";
     }
 }
