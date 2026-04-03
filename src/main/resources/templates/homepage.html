@@ -1,298 +1,226 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Online Course</title>
     <meta charset="UTF-8">
-
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Học lập trình Online | OnlineCourse</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            background: #f5f5f5;
-        }
-
-        .banner {
-            background: linear-gradient(90deg, #4facfe, #00f2fe);
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1f2937; }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
             color: white;
-            padding: 80px 20px;
-            text-align: center;
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+            border-bottom-left-radius: 60px;
+            border-bottom-right-radius: 60px;
         }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        .hero-title { font-size: 3.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px; }
+        .hero-subtitle { font-size: 1.25rem; opacity: 0.9; margin-bottom: 30px; max-width: 600px; }
+        .btn-pill { border-radius: 50px; padding: 12px 30px; font-weight: 600; transition: 0.3s; }
+        .btn-hero { background: white; color: #4f46e5; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-hero:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); color: #4338ca; }
 
-        .course-card {
-            transition: 0.3s;
-        }
+        /* Course Cards */
+        .section-title { position: relative; display: inline-block; padding-bottom: 10px; margin-bottom: 40px; font-weight: 800; color: #111827; }
+        .section-title::after { content: ''; position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: 60px; height: 4px; background: #6366f1; border-radius: 2px; }
+        
+        .course-card { border: none; border-radius: 24px; overflow: hidden; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
+        .course-card:hover { transform: translateY(-12px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+        .course-img-wrapper { position: relative; height: 200px; overflow: hidden; }
+        .course-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .course-card:hover .course-img { transform: scale(1.1); }
+.price-badge { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 5px 15px; border-radius: 50px; font-weight: 700; color: #ef4444; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        .card-body { padding: 25px; }
+        .course-title { font-size: 1.15rem; font-weight: 700; color: #111827; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.8rem; }
+        .course-desc { font-size: 0.9rem; color: #6b7280; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.5rem; }
+        
+        .btn-view { border: 2px solid #6366f1; color: #6366f1; background: transparent; }
+        .btn-view:hover { background: #6366f1; color: white; }
+        .btn-cart { background: #6366f1; color: white; border: none; }
+        .btn-cart:hover { background: #4f46e5; }
 
-        .course-card:hover {
-            transform: translateY(-5px);
-        }
+        /* Category Grid */
+        .cat-card { background: white; padding: 30px; border-radius: 20px; transition: 0.3s; border: 1px solid #f1f5f9; text-decoration: none; display: block; }
+        .cat-card:hover { border-color: #6366f1; background: #fdfeff; transform: scale(1.05); }
+        .cat-icon { font-size: 2.5rem; margin-bottom: 15px; display: block; }
+        .cat-name { font-weight: 700; color: #1f2937; margin-bottom: 0; }
 
-        .course-img {
-            height: 200px;
-            object-fit: cover;
-        }
-
-        .user-dropdown .avatar-circle {
-            width: 32px;
-            height: 32px;
-            border-radius: 999px;
-            background: #1d4ed8;
-            color: #fff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .user-dropdown .dropdown-menu {
-            min-width: 260px;
-            border-radius: 12px;
-            padding: 8px 0;
-        }
-
-        .user-dropdown .dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 16px;
-        }
-
-        .user-dropdown .dropdown-header {
-            padding: 10px 16px;
-        }
-
-        footer {
-            background: #222;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            margin-top: 40px;
-        }
+        /* Footer */
+        footer { background: #0f172a; color: #94a3b8; padding: 60px 0 30px; margin-top: 100px; }
+        .footer-brand { color: white; font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; display: block; }
+        .footer-link { color: #94a3b8; text-decoration: none; transition: 0.2s; }
+        .footer-link:hover { color: white; }
+        .social-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05); display: inline-flex; align-items: center; justify-content: center; color: white; margin-right: 10px; transition: 0.3s; }
+        .social-btn:hover { background: #6366f1; transform: translateY(-3px); }
     </style>
 </head>
-
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
+    <div th:replace="~{fragments/navbar :: navbar(activePage='home')}"></div>
 
-        <a class="navbar-brand" href="/">OnlineCourse</a>
+    <!-- HERO SECTION -->
+    <header class="hero text-center text-md-start">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <h1 class="hero-title">Đầu tư vào bản thân qua việc học</h1>
+                    <p class="hero-subtitle">Khám phá hàng trăm khóa học từ lập trình, marketing đến kỹ năng mềm với các chuyên gia hàng đầu. Bắt đầu lộ trình của bạn ngay hôm nay.</p>
+                    <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-md-start">
+                        <a href="/courses" class="btn btn-pill btn-hero">Khám phá khóa học</a>
+<a href="/register" class="btn btn-pill btn-outline-light px-4">Tham gia miễn phí</a>
+                    </div>
+                </div>
+                <div class="col-lg-5 d-none d-lg-block">
+                    <img src="https://img.freepik.com/free-vector/learning-concept-illustration_114360-1103.jpg" alt="Learning" class="img-fluid rounded-4 shadow-lg">
+                </div>
+            </div>
+        </div>
+    </header>
 
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ms-auto">
+    <!-- FEATURED COURSES -->
+    <section class="container mt-5 pt-5 pb-5">
+        <div class="text-center">
+            <h2 class="section-title">Khóa học nổi bật</h2>
+        </div>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="/">Trang chủ</a>
-                </li>
+        <div class="row g-4">
+            <!-- Empty state -->
+            <div th:if="${#lists.isEmpty(courses)}" class="col-12 text-center py-5">
+                <div class="p-5 bg-white rounded-4 shadow-sm">
+                    <i class="bi bi-journal-x fs-1 text-muted"></i>
+                    <p class="mt-3 text-muted">Chưa có khóa học nào được giới thiệu.</p>
+                </div>
+            </div>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="/courses">Khóa học</a>
-                </li>
-
-                <li class="nav-item" th:if="${isLogged}">
-                    <a class="nav-link" href="/cart">Giỏ hàng</a>
-                </li>
-
-                <li class="nav-item" th:if="${isLogged}">
-                    <a class="nav-link" href="/orders/history">Lịch sử</a>
-                </li>
-
-                <li class="nav-item" th:if="${!isLogged}">
-                    <a class="nav-link" href="/login">Đăng nhập</a>
-                </li>
-
-                <li class="nav-item" th:if="${!isLogged}">
-                    <a class="nav-link" href="/register">Đăng ký</a>
-                </li>
-
-                <li class="nav-item" th:if="${isAdmin}">
-                    <a class="nav-link text-warning fw-bold" href="/admin">⚡ Quản trị</a>
-                </li>
-
-                <li class="nav-item dropdown user-dropdown" th:if="${isLogged}">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#"
-                       role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="avatar-circle"
-                              th:text="${userDisplayName != null ? #strings.substring(userDisplayName, 0, 1) : 'U'}">U</span>
-                        <span class="d-none d-lg-inline" th:text="${userDisplayName}">Tài Khoản</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                        <li class="dropdown-header">
-                            <div class="fw-semibold" th:text="${userDisplayName}">Tài Khoản</div>
-                            <div class="text-muted small" th:text="${userHandle}">@user</div>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="/account">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                    <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
-                                    <path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                </svg>
-                                Thông tin tài khoản
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="/profile">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                    <rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
-                                    <path d="M8 9h8M8 13h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                </svg>
-                                Hồ sơ cá nhân
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="/orders/history">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                    <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="2"/>
-                                    <path d="M14 3v5h5" stroke="currentColor" stroke-width="2"/>
-                                </svg>
-                                Quản lý khóa học
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li class="px-2">
-                            <form th:action="@{/logout}" method="post">
-                                <button type="submit" class="dropdown-item text-danger">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                        <path d="M10 17l5-5-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M15 12H3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                        <path d="M21 4v16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                    </svg>
-                                    Đăng xuất
+            <!-- Course Grid -->
+            <div class="col-lg-4 col-md-6" th:each="course : ${courses}">
+                <div class="card course-card h-100">
+                    <div class="course-img-wrapper">
+                        <img th:src="${course.image}" class="course-img" alt="Course Image"
+                            onerror="this.src='https://via.placeholder.com/600x400/6366f1/ffffff?text=Course+Image'">
+                        <div class="price-badge" th:text="${#numbers.formatDecimal(course.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</div>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="course-title" th:text="${course.title}">Tiêu đề khóa học</h5>
+                        <p class="course-desc" th:text="${course.description}">Mô tả ngắn gọn về nội dung và giá trị của khóa học này dành cho học viên.</p>
+                        
+                        <div class="mt-auto pt-3 border-top d-flex gap-2">
+                            <form th:if="${isLogged && !isAdmin}" th:action="@{'/cart/add/' + ${course.id}}" method="POST" class="flex-grow-1">
+                                <button type="submit" class="btn btn-pill btn-cart w-100 py-2">
+                                    <i class="bi bi-cart-plus me-1"></i>Thêm vào giỏ
                                 </button>
                             </form>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-item d-none" th:if="${isLogged}">
-                    <form th:action="@{/logout}" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-link nav-link text-danger" style="text-decoration:none;">Đăng xuất</button>
-                    </form>
-                </li>
-
-            </ul>
-        </div>
-
-    </div>
-</nav>
-
-<!-- BANNER -->
-<section class="banner">
-    <h1>Học lập trình Online</h1>
-    <p>Hơn 100+ khóa học chất lượng cao</p>
-
-    <a href="/courses" class="btn btn-light btn-lg mt-3">
-        Xem khóa học
-    </a>
-</section>
-
-<!-- COURSE LIST -->
-<div class="container mt-5">
-
-    <h2 class="text-center mb-4">Khóa học nổi bật</h2>
-
-    <div class="row">
-
-        <!-- Nếu không có course -->
-        <div th:if="${#lists.isEmpty(courses)}" class="text-center">
-            <p>Chưa có khóa học nào</p>
-        </div>
-
-        <!-- Course item -->
-        <div class="col-md-4 mb-4"
-             th:each="course : ${courses}">
-
-            <div class="card course-card h-100 shadow-sm">
-
-                <img th:src="${course.image}"
-                     class="card-img-top course-img"
-                     alt="Course Image"
-                     onerror="this.src='https://via.placeholder.com/400x200/6366f1/ffffff?text=No+Image'">
-
-                <div class="card-body d-flex flex-column">
-
-                    <h5 class="card-title"
-                        th:text="${course.title}">
-                    </h5>
-
-                    <p class="card-text"
-                       th:text="${course.description}">
-                    </p>
-
-                    <div class="mt-auto">
-
-                        <h5 class="text-danger mb-2"
-                            th:text="${course.price} + ' $'">
-                        </h5>
-
-                        <form th:if="${isLogged && !isAdmin}" th:action="@{'/cart/add/' + ${course.id}}" method="POST" class="mb-2">
-                            <button type="submit" class="btn btn-danger w-100 rounded-pill fw-bold">
-                                <i class="bi bi-cart-plus me-1"></i>Thêm vào giỏ hàng
-                            </button>
-                        </form>
-
-                        <a th:href="@{'/courses/' + ${course.id}}"
-                           class="btn btn-primary w-100">
-                            Xem chi tiết
-                        </a>
-
+                            <a th:href="@{'/courses/' + ${course.id}}" class="btn btn-pill btn-view flex-grow-1 py-2 text-center text-decoration-none">
+                                Chi tiết
+                            </a>
+                        </div>
                     </div>
-
                 </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- CATEGORY -->
-<div class="container mt-5">
-
-    <h2 class="text-center mb-4">Danh mục khóa học</h2>
-
-    <div class="row text-center">
-
-        <div class="col-md-3">
-            <div class="card p-3 shadow-sm">
-                <h5>Java</h5>
             </div>
         </div>
+        
+        <div class="text-center mt-5">
+<a href="/courses" class="btn btn-link text-decoration-none fw-bold text-primary">Xem tất cả khóa học <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </section>
 
-        <div class="col-md-3">
-            <div class="card p-3 shadow-sm">
-                <h5>Web Development</h5>
+    <!-- CATEGORIES -->
+    <section class="bg-white py-5 mt-5">
+        <div class="container text-center py-4">
+            <h2 class="section-title">Khám phá theo danh mục</h2>
+            <div class="row g-4 mt-2">
+                <div class="col-6 col-md-3">
+                    <a href="/courses" class="cat-card">
+                        <span class="cat-icon">💻</span>
+                        <h6 class="cat-name">Lập trình</h6>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="/courses" class="cat-card">
+                        <span class="cat-icon">🎨</span>
+                        <h6 class="cat-name">Thiết kế</h6>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="/courses" class="cat-card">
+                        <span class="cat-icon">📈</span>
+                        <h6 class="cat-name">Marketing</h6>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="/courses" class="cat-card">
+                        <span class="cat-icon">🤝</span>
+                        <h6 class="cat-name">Kỹ năng mềm</h6>
+                    </a>
+                </div>
             </div>
         </div>
+    </section>
 
-        <div class="col-md-3">
-            <div class="card p-3 shadow-sm">
-                <h5>Python</h5>
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="row gy-5">
+                <div class="col-lg-4 col-md-12">
+                    <span class="footer-brand">🎓 OnlineCourse</span>
+                    <p class="mb-4">Chúng tôi cung cấp lộ trình học tập tối ưu, giúp bạn làm chủ công nghệ và phát triển sự nghiệp trong kỷ nguyên số.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-btn"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="social-btn"><i class="bi bi-youtube"></i></a>
+                        <a href="#" class="social-btn"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <h6 class="text-white fw-bold mb-4">Về chúng tôi</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="footer-link">Giới thiệu</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">Liên hệ</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">Điều khoản</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">Bảo mật</a></li>
+</ul>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <h6 class="text-white fw-bold mb-4">Học tập</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/courses" class="footer-link">Tất cả khóa học</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">Lộ trình học</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">Chứng chỉ</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">Hỏi đáp</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-4 col-12">
+                    <h6 class="text-white fw-bold mb-4">Đăng ký nhận tin</h6>
+                    <p class="small mb-4">Nhận thông tin về các khóa học mới nhất và mã giảm giá hấp dẫn.</p>
+                    <div class="input-group">
+                        <input type="text" class="form-control bg-transparent border-secondary text-white" placeholder="Email của bạn">
+                        <button class="btn btn-primary px-4" type="button">Gửi</button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-top border-secondary mt-5 pt-4 text-center">
+                <p class="mb-0 small">© 2026 OnlineCourse. Tất cả quyền được bảo lưu. Thiết kế bởi Antigravity.</p>
             </div>
         </div>
+    </footer>
 
-        <div class="col-md-3">
-            <div class="card p-3 shadow-sm">
-                <h5>AI & Machine Learning</h5>
-            </div>
-        </div>
-
-    </div>
-
-</div>
-
-<!-- FOOTER -->
-<footer>
-    <p>© 2026 OnlineCourse - Website bán khóa học</p>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,37 +1,32 @@
 package Nhom100.DoAnJ2EE.controller;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import Nhom100.DoAnJ2EE.entity.Course;
-import Nhom100.DoAnJ2EE.entity.Category;
-import Nhom100.DoAnJ2EE.entity.OrderDetail;
-import Nhom100.DoAnJ2EE.entity.Chapter;
-import Nhom100.DoAnJ2EE.entity.Lesson;
-import Nhom100.DoAnJ2EE.service.CourseService;
-import Nhom100.DoAnJ2EE.repository.CategoryRepository;
-import Nhom100.DoAnJ2EE.repository.UserRepository;
-import Nhom100.DoAnJ2EE.repository.OrderDetailRepository;
-import Nhom100.DoAnJ2EE.repository.ChapterRepository;
-import Nhom100.DoAnJ2EE.repository.LessonRepository;
-import Nhom100.DoAnJ2EE.dto.PurchasedCourseSummary;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.io.IOException;
-import java.util.UUID;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.beans.factory.annotation.Value;
+import java.time.LocalDateTime;
+import java.util.*;
+import Nhom100.DoAnJ2EE.entity.Course;
+import Nhom100.DoAnJ2EE.entity.Category;
+import Nhom100.DoAnJ2EE.entity.Chapter;
+import Nhom100.DoAnJ2EE.entity.Lesson;
+import Nhom100.DoAnJ2EE.entity.OrderDetail;
+import Nhom100.DoAnJ2EE.entity.User;
+import Nhom100.DoAnJ2EE.service.CourseService;
+import Nhom100.DoAnJ2EE.service.UserService;
+import Nhom100.DoAnJ2EE.repository.CategoryRepository;
+import Nhom100.DoAnJ2EE.repository.UserRepository;
+import Nhom100.DoAnJ2EE.repository.ChapterRepository;
+import Nhom100.DoAnJ2EE.repository.LessonRepository;
+import Nhom100.DoAnJ2EE.repository.OrderDetailRepository;
+import Nhom100.DoAnJ2EE.repository.RoleRepository;
+import Nhom100.DoAnJ2EE.dto.PurchasedCourseSummary;
 
 @Controller
 @RequestMapping("/admin")
@@ -42,19 +37,25 @@ public class AdminController {
     private CourseService courseService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private CategoryRepository categoryRepository;
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    private OrderDetailRepository orderDetailRepository;
-
-    @Autowired
     private ChapterRepository chapterRepository;
 
     @Autowired
     private LessonRepository lessonRepository;
+
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Value("${app.upload.dir:uploads}")
     private String uploadDir;
@@ -85,7 +86,8 @@ public class AdminController {
     @GetMapping("/courses/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         Course course = courseService.getCourseById(id).orElse(null);
-        if (course == null) return "redirect:/admin/courses";
+        if (course == null)
+return "redirect:/admin/courses";
         model.addAttribute("course", course);
         model.addAttribute("categories", categoryRepository.findAll());
         return "admin/course/form";
@@ -94,7 +96,8 @@ public class AdminController {
     @GetMapping("/courses/{id}/content")
     public String showCourseContent(@PathVariable Long id, Model model) {
         Course course = courseService.getCourseById(id).orElse(null);
-        if (course == null) return "redirect:/admin/courses";
+        if (course == null)
+            return "redirect:/admin/courses";
         List<Chapter> chapters = chapterRepository.findByCourseIdOrderById(id);
         Map<Long, List<Lesson>> lessonsByChapter = new HashMap<>();
         for (Chapter chapter : chapters) {
@@ -109,7 +112,8 @@ public class AdminController {
     @PostMapping("/courses/{id}/chapters")
     public String addChapter(@PathVariable Long id, @RequestParam String title) {
         Course course = courseService.getCourseById(id).orElse(null);
-        if (course == null) return "redirect:/admin/courses";
+        if (course == null)
+            return "redirect:/admin/courses";
         Chapter chapter = new Chapter();
         chapter.setTitle(title);
         chapter.setCourse(course);
@@ -119,10 +123,11 @@ public class AdminController {
 
     @PostMapping("/courses/{courseId}/chapters/{chapterId}/update")
     public String updateChapter(@PathVariable Long courseId,
-                                @PathVariable Long chapterId,
-                                @RequestParam String title) {
+            @PathVariable Long chapterId,
+            @RequestParam String title) {
         Chapter chapter = chapterRepository.findById(chapterId).orElse(null);
-        if (chapter == null) return "redirect:/admin/courses/" + courseId + "/content";
+        if (chapter == null)
+            return "redirect:/admin/courses/" + courseId + "/content";
         chapter.setTitle(title);
         chapterRepository.save(chapter);
         return "redirect:/admin/courses/" + courseId + "/content";
@@ -130,28 +135,35 @@ public class AdminController {
 
     @PostMapping("/courses/{courseId}/chapters/{chapterId}/lessons")
     public String addLesson(@PathVariable Long courseId,
-                            @PathVariable Long chapterId,
-                            @RequestParam("lessonTitles") List<String> lessonTitles,
-                            @RequestParam(value = "lessonFiles", required = false) List<MultipartFile> lessonFiles) {
+            @PathVariable Long chapterId,
+            @RequestParam(value = "lessonTitles", required = false) List<String> lessonTitles,
+            @RequestParam(value = "lessonFiles", required = false) List<MultipartFile> lessonFiles) {
         Chapter chapter = chapterRepository.findById(chapterId).orElse(null);
-        if (chapter == null) return "redirect:/admin/courses/" + courseId + "/content";
-        int count = lessonTitles != null ? lessonTitles.size() : 0;
-        for (int i = 0; i < count; i++) {
-            String title = lessonTitles.get(i);
-            if (title == null || title.trim().isEmpty()) {
-                continue;
-            }
-            Lesson lesson = new Lesson();
-            lesson.setTitle(title.trim());
-            MultipartFile file = (lessonFiles != null && lessonFiles.size() > i) ? lessonFiles.get(i) : null;
-            if (file != null && !file.isEmpty()) {
-                String wordName = saveUploadedFile(file, "lessons/words");
-                if (wordName != null) {
-                    lesson.setVideoUrl("/uploads/lessons/words/" + wordName);
+        if (chapter == null)
+            return "redirect:/admin/courses/" + courseId + "/content";
+        
+        if (lessonTitles != null) {
+            for (int i = 0; i < lessonTitles.size(); i++) {
+                String title = lessonTitles.get(i);
+                if (title == null || title.trim().isEmpty()) {
+                    continue;
                 }
+                Lesson lesson = new Lesson();
+                lesson.setTitle(title.trim());
+                lesson.setChapter(chapter);
+// Optional: Handle file upload if lessonFiles is provided
+                if (lessonFiles != null && i < lessonFiles.size()) {
+                    MultipartFile file = lessonFiles.get(i);
+                    if (file != null && !file.isEmpty()) {
+                        String fileName = saveUploadedFile(file, "lessons");
+                        if (fileName != null) {
+                            lesson.setVideoUrl("/uploads/lessons/" + fileName);
+                        }
+                    }
+                }
+                
+                lessonRepository.save(lesson);
             }
-            lesson.setChapter(chapter);
-            lessonRepository.save(lesson);
         }
         return "redirect:/admin/courses/" + courseId + "/content";
     }
@@ -164,19 +176,20 @@ public class AdminController {
 
     @PostMapping("/courses/{courseId}/chapters/{chapterId}/lessons/{lessonId}/delete")
     public String deleteLesson(@PathVariable Long courseId,
-                               @PathVariable Long chapterId,
-                               @PathVariable Long lessonId) {
+            @PathVariable Long chapterId,
+            @PathVariable Long lessonId) {
         lessonRepository.deleteById(lessonId);
         return "redirect:/admin/courses/" + courseId + "/content";
     }
 
     @PostMapping("/courses/{courseId}/chapters/{chapterId}/lessons/{lessonId}/update")
     public String updateLesson(@PathVariable Long courseId,
-                               @PathVariable Long chapterId,
-                               @PathVariable Long lessonId,
-                               @RequestParam String title) {
+            @PathVariable Long chapterId,
+            @PathVariable Long lessonId,
+            @RequestParam String title) {
         Lesson lesson = lessonRepository.findById(lessonId).orElse(null);
-        if (lesson == null) return "redirect:/admin/courses/" + courseId + "/content";
+        if (lesson == null)
+            return "redirect:/admin/courses/" + courseId + "/content";
         lesson.setTitle(title);
         lessonRepository.save(lesson);
         return "redirect:/admin/courses/" + courseId + "/content";
@@ -184,11 +197,12 @@ public class AdminController {
 
     @PostMapping("/courses/{courseId}/chapters/{chapterId}/content")
     public String updateChapterContent(@PathVariable Long courseId,
-                                       @PathVariable Long chapterId,
-                                       @RequestParam(required = false) MultipartFile chapterVideoFile,
-                                       @RequestParam(required = false) MultipartFile chapterPptFile) {
+            @PathVariable Long chapterId,
+            @RequestParam(required = false) MultipartFile chapterVideoFile,
+            @RequestParam(required = false) MultipartFile chapterPptFile) {
         Chapter chapter = chapterRepository.findById(chapterId).orElse(null);
-        if (chapter == null) return "redirect:/admin/courses/" + courseId + "/content";
+        if (chapter == null)
+            return "redirect:/admin/courses/" + courseId + "/content";
 
         String videoName = saveUploadedFile(chapterVideoFile, "chapters/videos");
         if (videoName == null && chapterVideoFile != null && !chapterVideoFile.isEmpty()) {
@@ -200,7 +214,7 @@ public class AdminController {
 
         String pptName = saveUploadedFile(chapterPptFile, "chapters/ppts");
         if (pptName == null && chapterPptFile != null && !chapterPptFile.isEmpty()) {
-            return "redirect:/admin/courses/" + courseId + "/content";
+return "redirect:/admin/courses/" + courseId + "/content";
         }
         if (pptName != null) {
             chapter.setContentPptUrl("/uploads/chapters/ppts/" + pptName);
@@ -212,7 +226,7 @@ public class AdminController {
 
     @PostMapping("/courses/save")
     public String saveCourse(@ModelAttribute("course") Course course,
-                             @RequestParam(required = false) MultipartFile courseVideoFile) {
+            @RequestParam(required = false) MultipartFile courseVideoFile) {
         if (courseVideoFile != null && !courseVideoFile.isEmpty()) {
             String videoName = saveUploadedFile(courseVideoFile, "courses/videos");
             if (videoName != null) {
@@ -239,18 +253,17 @@ public class AdminController {
 
         for (Course course : courses) {
             PurchasedCourseSummary summary = new PurchasedCourseSummary(
-                course.getId(),
-                course.getName(),
-                course.getTitle(),
-                course.getPrice()
-            );
+                    course.getId(),
+                    course.getName(),
+                    course.getTitle(),
+                    course.getPrice());
             boolean hasDetail = course.getPurchasedDetail() != null
-                && !course.getPurchasedDetail().isEmpty();
+                    && !course.getPurchasedDetail().isEmpty();
             hasDetail = hasDetail
-                || (course.getPurchasedVideoUrl() != null && !course.getPurchasedVideoUrl().isEmpty())
-                || (course.getPurchasedDocUrl() != null && !course.getPurchasedDocUrl().isEmpty())
-                || (course.getPurchasedPptUrl() != null && !course.getPurchasedPptUrl().isEmpty())
-                || chapterRepository.existsByCourseId(course.getId());
+                    || (course.getPurchasedVideoUrl() != null && !course.getPurchasedVideoUrl().isEmpty())
+                    || (course.getPurchasedDocUrl() != null && !course.getPurchasedDocUrl().isEmpty())
+                    || (course.getPurchasedPptUrl() != null && !course.getPurchasedPptUrl().isEmpty())
+                    || chapterRepository.existsByCourseId(course.getId());
             summary.setHasDetail(hasDetail);
             summaryMap.put(course.getId(), summary);
         }
@@ -263,18 +276,20 @@ public class AdminController {
             PurchasedCourseSummary summary = summaryMap.get(courseId);
             if (summary == null) {
                 summary = new PurchasedCourseSummary(
-                    courseId,
-                    od.getCourse().getName(),
-                    od.getCourse().getTitle(),
-                    od.getCourse().getPrice()
-                );
+                        courseId,
+                        od.getCourse().getName(),
+                        od.getCourse().getTitle(),
+                        od.getCourse().getPrice());
                 boolean hasDetail = od.getCourse().getPurchasedDetail() != null
-                    && !od.getCourse().getPurchasedDetail().isEmpty();
+&& !od.getCourse().getPurchasedDetail().isEmpty();
                 hasDetail = hasDetail
-                    || (od.getCourse().getPurchasedVideoUrl() != null && !od.getCourse().getPurchasedVideoUrl().isEmpty())
-                    || (od.getCourse().getPurchasedDocUrl() != null && !od.getCourse().getPurchasedDocUrl().isEmpty())
-                    || (od.getCourse().getPurchasedPptUrl() != null && !od.getCourse().getPurchasedPptUrl().isEmpty())
-                    || chapterRepository.existsByCourseId(od.getCourse().getId());
+                        || (od.getCourse().getPurchasedVideoUrl() != null
+                                && !od.getCourse().getPurchasedVideoUrl().isEmpty())
+                        || (od.getCourse().getPurchasedDocUrl() != null
+                                && !od.getCourse().getPurchasedDocUrl().isEmpty())
+                        || (od.getCourse().getPurchasedPptUrl() != null
+                                && !od.getCourse().getPurchasedPptUrl().isEmpty())
+                        || chapterRepository.existsByCourseId(od.getCourse().getId());
                 summary.setHasDetail(hasDetail);
                 summaryMap.put(courseId, summary);
             }
@@ -284,7 +299,7 @@ public class AdminController {
             LocalDateTime orderDate = od.getOrder() != null ? od.getOrder().getOrderDate() : null;
             if (orderDate != null) {
                 if (summary.getLastPurchaseDate() == null
-                    || orderDate.isAfter(summary.getLastPurchaseDate())) {
+                        || orderDate.isAfter(summary.getLastPurchaseDate())) {
                     summary.setLastPurchaseDate(orderDate);
                 }
             }
@@ -297,19 +312,21 @@ public class AdminController {
     @GetMapping("/purchased-courses/edit/{id}")
     public String showPurchasedCourseDetailForm(@PathVariable Long id, Model model) {
         Course course = courseService.getCourseById(id).orElse(null);
-        if (course == null) return "redirect:/admin/purchased-courses";
+        if (course == null)
+            return "redirect:/admin/purchased-courses";
         model.addAttribute("course", course);
         return "admin/purchased/form";
     }
 
     @PostMapping("/purchased-courses/save")
     public String savePurchasedCourseDetail(@RequestParam Long courseId,
-                                            @RequestParam(required = false) String purchasedDetail,
-                                            @RequestParam(required = false) MultipartFile purchasedVideoFile,
-                                            @RequestParam(required = false) MultipartFile purchasedDocFile,
-                                            @RequestParam(required = false) MultipartFile purchasedPptFile) {
+            @RequestParam(required = false) String purchasedDetail,
+            @RequestParam(required = false) MultipartFile purchasedVideoFile,
+            @RequestParam(required = false) MultipartFile purchasedDocFile,
+            @RequestParam(required = false) MultipartFile purchasedPptFile) {
         Course course = courseService.getCourseById(courseId).orElse(null);
-        if (course == null) return "redirect:/admin/purchased-courses";
+        if (course == null)
+            return "redirect:/admin/purchased-courses";
         course.setPurchasedDetail(purchasedDetail);
         String videoName = saveUploadedFile(purchasedVideoFile, "videos");
         if (videoName == null && purchasedVideoFile != null && !purchasedVideoFile.isEmpty()) {
@@ -324,7 +341,7 @@ public class AdminController {
             return "redirect:/admin/purchased-courses/edit/" + courseId;
         }
         if (docName != null) {
-            course.setPurchasedDocUrl("/uploads/docs/" + docName);
+course.setPurchasedDocUrl("/uploads/docs/" + docName);
         }
 
         String pptName = saveUploadedFile(purchasedPptFile, "ppts");
@@ -381,7 +398,8 @@ public class AdminController {
     @GetMapping("/categories/edit/{id}")
     public String showEditCategoryForm(@PathVariable Long id, Model model) {
         Category category = categoryRepository.findById(id).orElse(null);
-        if (category == null) return "redirect:/admin/categories";
+        if (category == null)
+            return "redirect:/admin/categories";
         model.addAttribute("category", category);
         return "admin/category/form";
     }
@@ -394,9 +412,45 @@ public class AdminController {
 
     @GetMapping("/categories/delete/{id}")
     public String deleteCategory(@PathVariable Long id) {
-        // Lưu ý: Nếu danh mục có khóa học, hibernate sẽ báo lỗi hoặc xóa cascade tùy config
+        // Lưu ý: Nếu danh mục có khóa học, hibernate sẽ báo lỗi hoặc xóa cascade tùy
+        // config
         categoryRepository.deleteById(id);
         return "redirect:/admin/categories";
+    }
 
+    // --- QUẢN LÝ NGƯỜI DÙNG ---
+
+    @GetMapping("/users")
+    public String listUsers(Model model) {
+model.addAttribute("users", userService.getAllUsers());
+        return "admin/user/list";
+    }
+
+    @GetMapping("/users/edit/{id}")
+    public String showEditUserForm(@PathVariable Long id, Model model) {
+        User user = userService.getUserById(id).orElse(null);
+        if (user == null)
+            return "redirect:/admin/users";
+        model.addAttribute("user", user);
+        model.addAttribute("allRoles", roleRepository.findAll());
+        return "admin/user/form";
+    }
+
+    @PostMapping("/users/save")
+    public String saveUser(@ModelAttribute("user") User user) {
+        // Lấy user cũ từ DB để giữ lại password (không thay đổi password ở đây)
+        User existingUser = userService.getUserById(user.getId()).orElse(null);
+        if (existingUser != null) {
+            user.setPassword(existingUser.getPassword());
+            user.setEmail(existingUser.getEmail()); // Giữ email không đổi nếu cần
+            userService.saveUser(user);
+        }
+        return "redirect:/admin/users";
+    }
+
+    @GetMapping("/users/delete/{id}")
+    public String deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return "redirect:/admin/users";
     }
 }
