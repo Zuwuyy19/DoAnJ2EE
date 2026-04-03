@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 </head>
 <body class="bg-light">
-
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="/admin">Admin Panel</a>
@@ -19,12 +18,10 @@
         </div>
     </div>
 </nav>
-
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="fw-bold">Danh sách Khóa học đã mua</h2>
+        <h2 class="fw-bold">Danh sách nội dung khóa học</h2>
     </div>
-
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             <table class="table table-hover align-middle mb-0">
@@ -54,10 +51,8 @@
                             <span class="badge bg-secondary" th:if="${!item.hasDetail}">Chưa có chi tiết</span>
                         </td>
                         <td class="text-end pe-3">
-                            <a th:href="@{'/admin/purchased-courses/edit/' + ${item.courseId}}"
-                               class="btn btn-sm btn-outline-secondary">Xem chi tiết</a>
-                            <a th:href="@{'/admin/purchased-courses/edit/' + ${item.courseId}}"
-                               class="btn btn-sm btn-primary">Cập nhật</a>
+                            <a th:href="@{'/admin/courses/' + ${item.courseId} + '/content'}"
+                               class="btn btn-sm btn-outline-primary">Cập nhật</a>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(purchasedCourses)}">
@@ -68,6 +63,5 @@
         </div>
     </div>
 </div>
-
 </body>
 </html>
