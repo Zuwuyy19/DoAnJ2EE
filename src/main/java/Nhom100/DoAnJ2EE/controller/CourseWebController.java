@@ -34,7 +34,7 @@ public class CourseWebController {
         if (auth != null && auth.isAuthenticated()
                 && !"anonymousUser".equals(auth.getPrincipal().toString())) {
             String email = auth.getName();
-            User user = userRepository.findByEmail(email);
+            User user = userRepository.findByEmail(email).orElse(null);
             return user != null ? user.getId() : null;
         }
         return null;

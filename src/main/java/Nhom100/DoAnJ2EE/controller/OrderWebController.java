@@ -28,7 +28,7 @@ public class OrderWebController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
             String email = auth.getName();
-            return userRepository.findByEmail(email);
+            return userRepository.findByEmail(email).orElse(null);
         }
         return null;
     }

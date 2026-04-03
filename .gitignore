@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+<<<<<<< HEAD
+=======
+uploads/
+*.mp4
+>>>>>>> a4172c31d8514ac624aa73aaca0a2c70dc79130d

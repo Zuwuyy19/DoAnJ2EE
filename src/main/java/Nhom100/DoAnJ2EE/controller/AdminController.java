@@ -87,7 +87,7 @@ public class AdminController {
     public String showEditForm(@PathVariable Long id, Model model) {
         Course course = courseService.getCourseById(id).orElse(null);
         if (course == null)
-return "redirect:/admin/courses";
+            return "redirect:/admin/courses";
         model.addAttribute("course", course);
         model.addAttribute("categories", categoryRepository.findAll());
         return "admin/course/form";
@@ -151,7 +151,8 @@ return "redirect:/admin/courses";
                 Lesson lesson = new Lesson();
                 lesson.setTitle(title.trim());
                 lesson.setChapter(chapter);
-// Optional: Handle file upload if lessonFiles is provided
+                
+                // Optional: Handle file upload if lessonFiles is provided
                 if (lessonFiles != null && i < lessonFiles.size()) {
                     MultipartFile file = lessonFiles.get(i);
                     if (file != null && !file.isEmpty()) {
@@ -214,7 +215,7 @@ return "redirect:/admin/courses";
 
         String pptName = saveUploadedFile(chapterPptFile, "chapters/ppts");
         if (pptName == null && chapterPptFile != null && !chapterPptFile.isEmpty()) {
-return "redirect:/admin/courses/" + courseId + "/content";
+            return "redirect:/admin/courses/" + courseId + "/content";
         }
         if (pptName != null) {
             chapter.setContentPptUrl("/uploads/chapters/ppts/" + pptName);
@@ -281,7 +282,7 @@ return "redirect:/admin/courses/" + courseId + "/content";
                         od.getCourse().getTitle(),
                         od.getCourse().getPrice());
                 boolean hasDetail = od.getCourse().getPurchasedDetail() != null
-&& !od.getCourse().getPurchasedDetail().isEmpty();
+                        && !od.getCourse().getPurchasedDetail().isEmpty();
                 hasDetail = hasDetail
                         || (od.getCourse().getPurchasedVideoUrl() != null
                                 && !od.getCourse().getPurchasedVideoUrl().isEmpty())
@@ -341,7 +342,7 @@ return "redirect:/admin/courses/" + courseId + "/content";
             return "redirect:/admin/purchased-courses/edit/" + courseId;
         }
         if (docName != null) {
-course.setPurchasedDocUrl("/uploads/docs/" + docName);
+            course.setPurchasedDocUrl("/uploads/docs/" + docName);
         }
 
         String pptName = saveUploadedFile(purchasedPptFile, "ppts");
@@ -422,7 +423,7 @@ course.setPurchasedDocUrl("/uploads/docs/" + docName);
 
     @GetMapping("/users")
     public String listUsers(Model model) {
-model.addAttribute("users", userService.getAllUsers());
+        model.addAttribute("users", userService.getAllUsers());
         return "admin/user/list";
     }
 

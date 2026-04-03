@@ -31,6 +31,20 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public Optional<User> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public User updateProfile(String email, User updatedUser) {
+        return userRepository.findByEmail(email).map(user -> {
+            user.setFullname(updatedUser.getFullname());
+            user.setPhoneNumber(updatedUser.getPhoneNumber());
+            user.setAddress(updatedUser.getAddress());
+            user.setAvatarUrl(updatedUser.getAvatarUrl());
+            return userRepository.save(user);
+        }).orElseThrow(() -> new RuntimeException("User not found: " + email));
+    }
+
     public void deleteUser(Long id) {
         userRepository.findById(id).ifPresent(user -> {
             user.setEnabled(false);

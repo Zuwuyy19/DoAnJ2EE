@@ -15,8 +15,11 @@ public class User {
     private Long id;
 
     private String email;
-
     private String password;
+    private String fullname;
+    private String phoneNumber;
+    private String address;
+    private String avatarUrl;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

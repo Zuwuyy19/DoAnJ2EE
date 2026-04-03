@@ -1,9 +1,8 @@
 package Nhom100.DoAnJ2EE.controller;
 
-import Nhom100.DoAnJ2EE.entity.Cart;
 import Nhom100.DoAnJ2EE.entity.User;
-import Nhom100.DoAnJ2EE.repository.UserRepository;
-import Nhom100.DoAnJ2EE.service.CartService;
+import Nhom100.DoAnJ2EE.service.UserService;
+import Nhom100.DoAnJ2EE.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,35 +12,35 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/cart")
-public class CartWebController {
+@RequestMapping("/account")
+public class AccountWebController {
 
     @Autowired
-    private CartService cartService;
+    private UserService userService;
 
     @Autowired
-    private UserRepository userRepository;
+    private OrderService orderService;
 
     private User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
             String email = auth.getName();
-            return userRepository.findByEmail(email).orElse(null);
+            return userService.getUserByEmail(email).orElse(null);
         }
         return null;
     }
-    
+
     private void addAuthAttributes(Model model, User user) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = false;
         boolean isLogged = user != null;
         String userDisplayName = null;
         String userHandle = null;
-        if (isLogged) {
+        if (isLogged && user != null) {
             isAdmin = auth.getAuthorities().stream()
                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-            userDisplayName = auth.getName();
-            userHandle = "@" + auth.getName();
+            userDisplayName = user.getFullname() != null ? user.getFullname() : auth.getName();
+            userHandle = "@" + auth.getName().split("@")[0];
         }
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("isLogged", isLogged);
@@ -50,60 +49,47 @@ public class CartWebController {
     }
 
     @GetMapping
-    public String viewCart(Model model) {
+    public String index(Model model) {
         User user = getAuthenticatedUser();
         if (user == null) {
             return "redirect:/login";
         }
         addAuthAttributes(model, user);
-        
-        Cart cart = cartService.getCartByUser(user);
-        model.addAttribute("cart", cart);
-        return "cart/index";
-    }
-
-    @PostMapping("/add/{courseId}")
-    public String addToCart(@PathVariable Long courseId, RedirectAttributes redirectAttributes) {
-        User user = getAuthenticatedUser();
-        if (user == null) {
-            return "redirect:/login";
-        }
-
-        try {
-            cartService.addToCart(user, courseId);
-            redirectAttributes.addFlashAttribute("successMessage", "Đã thêm khóa học vào giỏ hàng");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        if (user != null) {
+            model.addAttribute("user", user);
+            
+            // Fetch stats
+            model.addAttribute("purchasedCount", orderService.getMyCourses(user.getId()).size());
         }
         
-        return "redirect:/courses/" + courseId;
+        return "account/index";
     }
 
-    @PostMapping("/remove/{itemId}")
-    public String removeFromCart(@PathVariable Long itemId) {
+    @GetMapping("/edit")
+    public String editForm(Model model) {
         User user = getAuthenticatedUser();
         if (user == null) {
             return "redirect:/login";
         }
-
-        cartService.removeFromCart(user, itemId);
-        return "redirect:/cart";
+        addAuthAttributes(model, user);
+        model.addAttribute("user", user);
+        return "account/edit";
     }
 
-    @PostMapping("/checkout")
-    public String checkout(RedirectAttributes redirectAttributes) {
+    @PostMapping("/edit")
+    public String updateProfile(@ModelAttribute User updatedUser, RedirectAttributes redirectAttributes) {
         User user = getAuthenticatedUser();
         if (user == null) {
             return "redirect:/login";
         }
-
+        
         try {
-            cartService.checkout(user);
-            redirectAttributes.addFlashAttribute("successMessage", "Thanh toán thành công! Bạn có thể xem khóa học trong Lịch sử mua hàng.");
-            return "redirect:/orders/history";
+            userService.updateProfile(user.getEmail(), updatedUser);
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật hồ sơ thành công!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/cart";
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
         }
+        
+        return "redirect:/account";
     }
 }

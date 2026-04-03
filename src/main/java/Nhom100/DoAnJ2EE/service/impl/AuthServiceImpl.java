@@ -51,7 +51,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // Tạo sẵn một tài khoản Admin để test
-        if (userRepository.findByEmail("admin@gmail.com") == null) {
+        if (userRepository.findByEmail("admin@gmail.com").orElse(null) == null) {
             User admin = new User();
             admin.setEmail("admin@gmail.com");
             admin.setPassword(passwordEncoder.encode("123456"));
@@ -91,7 +91,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String login(LoginRequest request) {
 
-        User user = userRepository.findByEmail(request.getEmail());
+        User user = userRepository.findByEmail(request.getEmail()).orElse(null);
 
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             return "Login failed!";
@@ -103,7 +103,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public boolean loginWeb(LoginRequest request) {
 
-        User user = userRepository.findByEmail(request.getEmail());
+        User user = userRepository.findByEmail(request.getEmail()).orElse(null);
 
         if (user == null)
             return false;
