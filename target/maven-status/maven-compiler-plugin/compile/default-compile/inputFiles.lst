@@ -19,6 +19,7 @@ D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\DoAnJ2EeApplication.java
 D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\dto\CreateOrderRequest.java
 D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\dto\LoginRequest.java
 D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\dto\OrderResponse.java
+D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\dto\PurchasedCourseSummary.java
 D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\dto\RegisterRequest.java
 D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\entity\Cart.java
 D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\entity\CartItem.java
