@@ -1,97 +1,114 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <title>Giỏ hàng</title>
+    <title>Giỏ hàng | OnlineCourse</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .card {
+            border-radius: 16px;
+            transition: transform 0.2s;
+        }
+
+        .btn-pill {
+            border-radius: 50px;
+            padding: 10px 24px;
+            font-weight: 600;
+        }
+
+        .table thead th {
+            border-top: none;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .course-img {
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+    </style>
 </head>
+
 <body class="bg-light">
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" href="/">OnlineCourse</a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="/">Trang chủ</a></li>
-                <li class="nav-item"><a class="nav-link" href="/courses">Khóa học</a></li>
-                <li class="nav-item" th:if="${isLogged}"><a class="nav-link active" href="/cart">Giỏ hàng</a></li>
-                <li class="nav-item" th:if="${isLogged}"><a class="nav-link" href="/orders/history">Lịch sử</a></li>
-                
-                <li class="nav-item" th:if="${!isLogged}"><a class="nav-link" href="/login">Đăng nhập</a></li>
-                <li class="nav-item" th:if="${!isLogged}"><a class="nav-link" href="/register">Đăng ký</a></li>
-                <li class="nav-item" th:if="${isAdmin}"><a class="nav-link text-warning fw-bold" href="/admin">⚡ Quản trị</a></li>
-                <li class="nav-item" th:if="${isLogged}">
-                    <form th:action="@{/logout}" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-link nav-link text-danger" style="text-decoration:none;">Đăng xuất</button>
-                    </form>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+    <div th:replace="~{fragments/navbar :: navbar(activePage='cart')}"></div>
 
-<div class="container mt-5">
-    <h2 class="mb-4">Giỏ hàng của bạn</h2>
+    <div class="container mt-5">
+        <h2 class="mb-4">Giỏ hàng của bạn</h2>
 
-    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
-    
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card shadow-sm border-0 mb-4 p-3" th:if="${cart != null && !#lists.isEmpty(cart.items)}">
-                <table class="table table-borderless align-middle mb-0">
-                    <thead class="bg-light text-muted">
-                        <tr>
-                            <th scope="col" style="width: 50%">Khóa học</th>
-                            <th scope="col" style="width: 25%">Giá</th>
-                            <th scope="col" style="width: 25%">Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="item : ${cart.items}" class="border-bottom">
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <img th:src="${item.course.image}" class="rounded me-3" style="width: 80px; height: 50px; object-fit: cover;">
-                                    <span class="fw-bold" th:text="${item.course.title}"></span>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="text-danger fw-bold" th:text="${item.course.price} + ' $'"></span>
-                            </td>
-                            <td>
-                                <form th:action="@{'/cart/remove/' + ${item.id}}" method="post">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger shadow-sm">Xóa</button>
-                                </form>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
-            <div th:if="${cart == null || #lists.isEmpty(cart.items)}" class="text-center p-5 bg-white rounded shadow-sm">
-                <h4 class="text-muted mb-3">Giỏ hàng trống</h4>
-                <a href="/courses" class="btn btn-primary rounded-pill px-4 py-2">Khám phá khóa học ngay</a>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 p-4">
-                <h5 class="fw-bold mb-4">Tổng cộng</h5>
-                <div class="d-flex justify-content-between mb-4">
-                    <span class="text-muted">Tổng tiền:</span>
-                    <h3 class="text-danger fw-bold mb-0" th:text="${cart != null ? cart.totalAmount : 0.0} + ' $'"></h3>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card shadow-sm border-0 mb-4 p-3" th:if="${cart != null && !#lists.isEmpty(cart.items)}">
+                    <table class="table table-borderless align-middle mb-0">
+                        <thead class="bg-light text-muted">
+                            <tr>
+                                <th scope="col" style="width: 50%">Khóa học</th>
+                                <th scope="col" style="width: 25%">Giá</th>
+                                <th scope="col" style="width: 25%">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="item : ${cart.items}" class="border-bottom">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img th:src="${item.course.image}" class="rounded me-3"
+                                            style="width: 80px; height: 50px; object-fit: cover;">
+                                        <span class="fw-bold" th:text="${item.course.title}"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="text-danger fw-bold" th:text="${item.course.price} + ' $'"></span>
+                                </td>
+                                <td>
+                                    <form th:action="@{'/cart/remove/' + ${item.id}}" method="post">
+                                        <button type="submit"
+                                            class="btn btn-sm btn-outline-danger shadow-sm">Xóa</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                
-                <form th:action="@{/cart/checkout}" method="post">
-                    <button type="submit" class="btn btn-danger btn-lg w-100 rounded-pill shadow-sm fw-bold" th:disabled="${cart == null || #lists.isEmpty(cart.items)}">
-                        Thanh toán (Fake)
-                    </button>
-                </form>
+
+                <div th:if="${cart == null || #lists.isEmpty(cart.items)}"
+                    class="text-center p-5 bg-white rounded shadow-sm">
+                    <h4 class="text-muted mb-3">Giỏ hàng trống</h4>
+                    <a href="/courses" class="btn btn-primary rounded-pill px-4 py-2">Khám phá khóa học ngay</a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 p-4">
+                    <h5 class="fw-bold mb-4">Tổng cộng</h5>
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="text-muted">Tổng tiền:</span>
+                        <h3 class="text-danger fw-bold mb-0" th:text="${cart != null ? cart.totalAmount : 0.0} + ' $'">
+                        </h3>
+                    </div>
+
+                    <form th:action="@{/cart/checkout}" method="post">
+                        <button type="submit" class="btn btn-danger btn-lg w-100 rounded-pill shadow-sm fw-bold"
+                            th:disabled="${cart == null || #lists.isEmpty(cart.items)}">
+                            Thanh toán (Fake)
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

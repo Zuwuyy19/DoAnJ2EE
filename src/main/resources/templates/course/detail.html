@@ -115,33 +115,7 @@
 </head>
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
-    <div class="container">
-        <a class="navbar-brand" href="/">🎓 OnlineCourse</a>
-        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navMenu">
-            <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
-                <li class="nav-item"><a class="nav-link" href="/">Trang chủ</a></li>
-                <li class="nav-item"><a class="nav-link active fw-bold text-primary" href="/courses">Khóa học</a></li>
-                <li class="nav-item" th:if="${isLogged}"><a class="nav-link" href="/cart">Giỏ hàng</a></li>
-                <li class="nav-item" th:if="${isLogged}"><a class="nav-link" href="/orders/history">Lịch sử</a></li>
-                <li class="nav-item" th:if="${isAdmin}"><span class="admin-badge ms-2">⚡ ADMIN</span></li>
-                <li class="nav-item" th:if="${isLogged}">
-                    <a class="nav-link text-danger fw-semibold" href="/logout">Đăng xuất</a>
-                </li>
-                <li class="nav-item" th:if="${!isLogged}">
-                    <a class="btn btn-primary ms-lg-2 rounded-pill px-3" href="/login">Đăng nhập</a>
-                </li>
-                <li class="nav-item" th:if="${!isLogged}">
-                    <a class="btn btn-outline-primary ms-lg-1 rounded-pill px-3" href="/register">Đăng ký</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<div th:replace="~{fragments/navbar :: navbar(activePage='courses')}"></div>
 
 <!-- HERO -->
 <section class="course-hero">
