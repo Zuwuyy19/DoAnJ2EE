@@ -8,9 +8,12 @@ import org.springframework.web.bind.annotation.*;
 
 import Nhom100.DoAnJ2EE.entity.Course;
 import Nhom100.DoAnJ2EE.entity.Category;
+import Nhom100.DoAnJ2EE.entity.User;
 import Nhom100.DoAnJ2EE.service.CourseService;
+import Nhom100.DoAnJ2EE.service.UserService;
 import Nhom100.DoAnJ2EE.repository.CategoryRepository;
 import Nhom100.DoAnJ2EE.repository.UserRepository;
+import Nhom100.DoAnJ2EE.repository.RoleRepository;
 
 @Controller
 @RequestMapping("/admin")
@@ -25,6 +28,12 @@ public class AdminController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @GetMapping
     public String adminDashboard(Model model) {
@@ -103,6 +112,40 @@ public class AdminController {
         // Lưu ý: Nếu danh mục có khóa học, hibernate sẽ báo lỗi hoặc xóa cascade tùy config
         categoryRepository.deleteById(id);
         return "redirect:/admin/categories";
+    }
 
+    // --- QUẢN LÝ NGƯỜI DÙNG ---
+
+    @GetMapping("/users")
+    public String listUsers(Model model) {
+        model.addAttribute("users", userService.getAllUsers());
+        return "admin/user/list";
+    }
+
+    @GetMapping("/users/edit/{id}")
+    public String showEditUserForm(@PathVariable Long id, Model model) {
+        User user = userService.getUserById(id).orElse(null);
+        if (user == null) return "redirect:/admin/users";
+        model.addAttribute("user", user);
+        model.addAttribute("allRoles", roleRepository.findAll());
+        return "admin/user/form";
+    }
+
+    @PostMapping("/users/save")
+    public String saveUser(@ModelAttribute("user") User user) {
+        // Lấy user cũ từ DB để giữ lại password (không thay đổi password ở đây)
+        User existingUser = userService.getUserById(user.getId()).orElse(null);
+        if (existingUser != null) {
+            user.setPassword(existingUser.getPassword());
+            user.setEmail(existingUser.getEmail()); // Giữ email không đổi nếu cần
+            userService.saveUser(user);
+        }
+        return "redirect:/admin/users";
+    }
+
+    @GetMapping("/users/delete/{id}")
+    public String deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return "redirect:/admin/users";
     }
 }
