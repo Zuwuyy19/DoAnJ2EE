@@ -1,8 +1,11 @@
 package Nhom100.DoAnJ2EE.controller;
 
 import Nhom100.DoAnJ2EE.entity.Course;
+import Nhom100.DoAnJ2EE.entity.User;
 import Nhom100.DoAnJ2EE.repository.CourseRepository;
 import Nhom100.DoAnJ2EE.repository.CategoryRepository;
+import Nhom100.DoAnJ2EE.repository.OrderDetailRepository;
+import Nhom100.DoAnJ2EE.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,21 +19,22 @@ public class CourseWebController {
 
     @Autowired
     private CourseRepository courseRepository;
-    
-    @Autowired
-    private CategoryRepository categoryRepository;
-    
-    @Autowired
-    private Nhom100.DoAnJ2EE.repository.OrderDetailRepository orderDetailRepository;
 
     @Autowired
-    private Nhom100.DoAnJ2EE.repository.UserRepository userRepository;
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     private Long getAuthenticatedUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
+        if (auth != null && auth.isAuthenticated()
+                && !"anonymousUser".equals(auth.getPrincipal().toString())) {
             String email = auth.getName();
-            Nhom100.DoAnJ2EE.entity.User user = userRepository.findByEmail(email);
+            User user = userRepository.findByEmail(email);
             return user != null ? user.getId() : null;
         }
         return null;
@@ -40,19 +44,19 @@ public class CourseWebController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = false;
         boolean isLogged = false;
-        String userDisplayName = null;
-        String userHandle = null;
-        if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
+        if (auth != null && auth.isAuthenticated()
+                && !"anonymousUser".equals(auth.getPrincipal().toString())) {
             isLogged = true;
             isAdmin = auth.getAuthorities().stream()
                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-            userDisplayName = auth.getName();
-            userHandle = "@" + auth.getName();
         }
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("isLogged", isLogged);
-        model.addAttribute("userDisplayName", userDisplayName);
-        model.addAttribute("userHandle", userHandle);
+    }
+
+    private boolean hasPurchased(Long userId, Long courseId) {
+        if (userId == null) return false;
+        return orderDetailRepository.existsByOrderUserIdAndCourseId(userId, courseId);
     }
 
     @GetMapping("/courses")
@@ -66,17 +70,36 @@ public class CourseWebController {
     @GetMapping("/courses/{id}")
     public String courseDetail(@PathVariable Long id, Model model) {
         addAuthAttributes(model);
+
         Course course = courseRepository.findById(id).orElse(null);
-        if(course == null) return "redirect:/courses";
-        
+        if (course == null) return "redirect:/courses";
+
         Long userId = getAuthenticatedUserId();
-        boolean isPurchased = false;
-        if (userId != null) {
-            isPurchased = orderDetailRepository.existsByOrderUserIdAndCourseId(userId, id);
-        }
-        
+        boolean isPurchased = hasPurchased(userId, id);
+
+        // Thống kê
+        int totalChapters = course.getChapters() != null ? course.getChapters().size() : 0;
+        int totalLessons = course.getChapters() == null ? 0
+                : course.getChapters().stream()
+                        .mapToInt(c -> c.getLessons() != null ? c.getLessons().size() : 0)
+                        .sum();
+        long totalStudents = orderDetailRepository.countDistinctStudentsByCourseId(id);
+
+        // Khóa học liên quan (cùng danh mục, không bao gồm course hiện tại)
+        var relatedCourses = course.getCategory() != null
+                ? courseRepository.findByCategoryId(course.getCategory().getId())
+                        .stream()
+                        .filter(c -> !c.getId().equals(id))
+                        .toList()
+                : java.util.Collections.emptyList();
+
         model.addAttribute("course", course);
         model.addAttribute("isPurchased", isPurchased);
+        model.addAttribute("totalChapters", totalChapters);
+        model.addAttribute("totalLessons", totalLessons);
+        model.addAttribute("totalStudents", totalStudents);
+        model.addAttribute("relatedCourses", relatedCourses);
+
         return "course/detail";
     }
 }
