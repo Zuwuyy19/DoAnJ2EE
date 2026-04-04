@@ -3,6 +3,7 @@ package Nhom100.DoAnJ2EE.controller;
 import Nhom100.DoAnJ2EE.dto.OrderResponse;
 import Nhom100.DoAnJ2EE.entity.User;
 import Nhom100.DoAnJ2EE.repository.UserRepository;
+import Nhom100.DoAnJ2EE.service.CartService;
 import Nhom100.DoAnJ2EE.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -24,9 +25,12 @@ public class OrderWebController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CartService cartService;
+
     private User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
             String email = auth.getName();
             return userRepository.findByEmail(email).orElse(null);
         }
@@ -45,10 +49,13 @@ public class OrderWebController {
             userDisplayName = auth.getName();
             userHandle = "@" + auth.getName();
         }
+        int cartItemCount = (user != null) ? cartService.getCartItemCount(user) : 0;
+
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("isLogged", isLogged);
         model.addAttribute("userDisplayName", userDisplayName);
         model.addAttribute("userHandle", userHandle);
+        model.addAttribute("cartItemCount", cartItemCount);
     }
 
     @GetMapping("/history")
@@ -61,7 +68,7 @@ public class OrderWebController {
 
         List<OrderResponse> orders = orderService.getMyCourses(user.getId());
         model.addAttribute("orders", orders);
-        
+
         return "order/history";
     }
 }

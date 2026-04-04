@@ -8,6 +8,7 @@ import Nhom100.DoAnJ2EE.repository.CourseReviewRepository;
 import Nhom100.DoAnJ2EE.repository.CategoryRepository;
 import Nhom100.DoAnJ2EE.repository.OrderDetailRepository;
 import Nhom100.DoAnJ2EE.repository.UserRepository;
+import Nhom100.DoAnJ2EE.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,6 +42,9 @@ public class CourseWebController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CartService cartService;
+
     private Long getAuthenticatedUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated()
@@ -58,6 +62,8 @@ public class CourseWebController {
         boolean isLogged = false;
         String userDisplayName = null;
         String userHandle = null;
+        User currentUser = null;
+
         if (auth != null && auth.isAuthenticated()
                 && !"anonymousUser".equals(auth.getPrincipal().toString())) {
             isLogged = true;
@@ -65,11 +71,16 @@ public class CourseWebController {
                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
             userDisplayName = auth.getName();
             userHandle = "@" + auth.getName();
+            currentUser = userRepository.findByEmail(auth.getName()).orElse(null);
         }
+
+        int cartItemCount = (currentUser != null) ? cartService.getCartItemCount(currentUser) : 0;
+
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("isLogged", isLogged);
         model.addAttribute("userDisplayName", userDisplayName);
         model.addAttribute("userHandle", userHandle);
+        model.addAttribute("cartItemCount", cartItemCount);
     }
 
     private boolean hasPurchased(Long userId, Long courseId) {

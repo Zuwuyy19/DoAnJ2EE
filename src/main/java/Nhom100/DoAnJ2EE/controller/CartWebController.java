@@ -5,7 +5,9 @@ import Nhom100.DoAnJ2EE.entity.Cart;
 import Nhom100.DoAnJ2EE.entity.User;
 import Nhom100.DoAnJ2EE.repository.UserRepository;
 import Nhom100.DoAnJ2EE.service.CartService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Map;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -25,7 +27,7 @@ public class CartWebController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()
                 || "anonymousUser".equals(auth.getPrincipal())) return null;
-        return userRepository.findByEmail(auth.getName());
+        return userRepository.findByEmail(auth.getName()).orElse(null);
     }
 
     private void addAuthAttributes(Model model, User user) {
@@ -48,7 +50,7 @@ public class CartWebController {
 
     @GetMapping
     public String viewCart(Model model) {
-        User user = getAuthenticatedUser();
+        User user = getCurrentUser();
         if (user == null) {
             return "redirect:/login";
         }
@@ -61,7 +63,7 @@ public class CartWebController {
 
     @PostMapping("/add/{courseId}")
     public String addToCart(@PathVariable Long courseId, RedirectAttributes redirectAttributes) {
-        User user = getAuthenticatedUser();
+        User user = getCurrentUser();
         if (user == null) {
             return "redirect:/login";
         }
@@ -78,7 +80,7 @@ public class CartWebController {
 
     @PostMapping("/remove/{itemId}")
     public String removeFromCart(@PathVariable Long itemId) {
-        User user = getAuthenticatedUser();
+        User user = getCurrentUser();
         if (user == null) {
             return "redirect:/login";
         }
@@ -89,7 +91,7 @@ public class CartWebController {
 
     @PostMapping("/checkout")
     public String checkout(RedirectAttributes redirectAttributes) {
-        User user = getAuthenticatedUser();
+        User user = getCurrentUser();
         if (user == null) {
             return "redirect:/login";
         }

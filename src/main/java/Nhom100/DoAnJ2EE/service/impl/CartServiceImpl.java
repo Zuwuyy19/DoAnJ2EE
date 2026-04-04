@@ -11,8 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -43,6 +46,12 @@ public class CartServiceImpl implements CartService {
                     newCart.setUser(user);
                     return cartRepository.save(newCart);
                 });
+    }
+
+    @Override
+    public int getCartItemCount(User user) {
+        Cart cart = getCartByUser(user);
+        return (int) cartItemRepository.countByCartId(cart.getId());
     }
 
     @Override
@@ -133,6 +142,17 @@ public class CartServiceImpl implements CartService {
         cartRepository.save(cart);
 
         return responses;
+    }
+
+    @Override
+    @Transactional
+    public void clearCart(User user) {
+        Cart cart = getCartByUser(user);
+        if (cart == null || cart.getItems().isEmpty()) return;
+        cartItemRepository.deleteAll(cart.getItems());
+        cart.getItems().clear();
+        cart.updateTotalPrice();
+        cartRepository.save(cart);
     }
 
     @Override

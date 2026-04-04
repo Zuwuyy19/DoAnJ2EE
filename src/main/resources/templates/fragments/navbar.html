@@ -80,6 +80,33 @@
             .logout-btn:hover {
                 background-color: #fef2f2 !important;
             }
+            .navbar .nav-link {
+                position: relative;
+                transition: color 0.2s ease, background-color 0.2s ease;
+            }
+            .navbar .nav-link::after {
+                content: '';
+                position: absolute;
+                bottom: 2px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 0;
+                height: 2px;
+                background: #2563eb;
+                border-radius: 2px;
+                transition: width 0.3s ease;
+            }
+            .navbar .nav-link:hover::after,
+            .navbar .nav-link.active::after {
+                width: 60%;
+            }
+            .navbar .nav-link:hover {
+                background-color: #f1f5f9;
+                border-radius: 8px;
+            }
+            .navbar .nav-item:hover .nav-link {
+                color: #2563eb;
+            }
         </style>
 
         <div class="container">
@@ -98,7 +125,12 @@
                         <a class="nav-link px-3 fw-semibold" th:classappend="${activePage == 'courses' ? 'active text-primary' : ''}" href="/courses">Khóa học</a>
                     </li>
                     <li class="nav-item" th:if="${isLogged}">
-                        <a class="nav-link px-3 fw-semibold" th:classappend="${activePage == 'cart' ? 'active text-primary' : ''}" href="/cart">Giỏ hàng</a>
+                        <a class="nav-link px-3 fw-semibold position-relative" th:classappend="${activePage == 'cart' ? 'active text-primary' : ''}" href="/cart">
+                            <span class="position-relative d-inline-flex align-items-center justify-content-center" style="width:24px; height:24px;">
+                                <i class="bi bi-cart3 fs-5"></i>
+                                <span th:if="${cartItemCount > 0}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.6rem; min-width:18px; height:18px; line-height:18px; text-align:center; color:white; font-weight:700;" th:text="${cartItemCount}">0</span>
+                            </span>
+                        </a>
                     </li>
                     <li class="nav-item" th:if="${isLogged}">
                         <a class="nav-link px-3 fw-semibold" th:classappend="${activePage == 'history' ? 'active text-primary' : ''}" href="/orders/history">Lịch sử</a>

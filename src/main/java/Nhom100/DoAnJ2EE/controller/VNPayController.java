@@ -43,7 +43,7 @@ public class VNPayController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()
                 || "anonymousUser".equals(auth.getPrincipal())) return null;
-        return userRepository.findByEmail(auth.getName());
+        return userRepository.findByEmail(auth.getName()).orElse(null);
     }
 
     private String getClientIp(HttpServletRequest request) {
