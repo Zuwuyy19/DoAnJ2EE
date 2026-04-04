@@ -142,12 +142,15 @@
                             Chưa có đánh giá
                         </div>
                         
-                        <div class="mt-auto pt-3 border-top d-flex gap-2">
-                            <form th:if="${isLogged && !isAdmin}" th:action="@{'/cart/add/' + ${course.id}}" method="POST" class="flex-grow-1">
+                        <div class="mt-auto pt-3 border-top d-flex flex-nowrap gap-2">
+                            <form th:if="${isLogged && !isAdmin && !purchasedCourseIds.contains(course.id)}" th:action="@{'/cart/add/' + ${course.id}}" method="POST" class="flex-grow-1">
                                 <button type="submit" class="btn btn-pill btn-cart w-100 py-2">
                                     <i class="bi bi-cart-plus me-1"></i>Thêm vào giỏ
                                 </button>
                             </form>
+                            <a th:if="${purchasedCourseIds.contains(course.id)}" th:href="@{'/courses/' + ${course.id}}" class="btn btn-pill btn-success py-2 text-nowrap text-decoration-none" style="white-space:nowrap; flex-shrink:0;">
+                                <i class="bi bi-check-circle me-1"></i>Đã sở hữu
+                            </a>
                             <a th:href="@{'/courses/' + ${course.id}}" class="btn btn-pill btn-view flex-grow-1 py-2 text-center text-decoration-none">
                                 Chi tiết
                             </a>

@@ -2,6 +2,7 @@ package Nhom100.DoAnJ2EE.repository;
 
 import Nhom100.DoAnJ2EE.entity.OrderDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -12,6 +13,14 @@ import java.util.List;
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
     List<OrderDetail> findByOrderUserId(Long userId);
     boolean existsByOrderUserIdAndCourseId(Long userId, Long courseId);
+
+    @Query("SELECT CASE WHEN COUNT(od) > 0 THEN true ELSE false END FROM OrderDetail od " +
+           "WHERE od.order.user.id = :userId AND od.course.id = :courseId AND od.order.status = 'COMPLETED'")
+    boolean existsCompletedOrderByUserAndCourse(@Param("userId") Long userId, @Param("courseId") Long courseId);
+
+    @Modifying
+    @Query("DELETE FROM OrderDetail od WHERE od.order.id = :orderId")
+    void deleteByOrderId(@Param("orderId") Long orderId);
 
     @Query("SELECT COUNT(DISTINCT od.order.user.id) FROM OrderDetail od WHERE od.course.id = :courseId")
     long countDistinctStudentsByCourseId(@Param("courseId") Long courseId);
