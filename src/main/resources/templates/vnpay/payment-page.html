@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán VNPay</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root { --primary: #1d4ed8; --primary-dark: #1e40af; }
+        body { background: linear-gradient(135deg, #eff6ff, #dbeafe); min-height: 100vh; font-family: 'Segoe UI', sans-serif; }
+        .payment-card {
+            background: white; border-radius: 24px; padding: 48px 40px;
+            max-width: 540px; margin: 50px auto;
+            box-shadow: 0 20px 60px rgba(29,78,216,0.15);
+        }
+        .vnpay-logo { font-size: 2.2rem; font-weight: 900; color: var(--primary); margin-bottom: 4px; }
+        .order-info-box {
+            background: linear-gradient(135deg, #eff6ff, #f8fafc);
+            border: 1px solid #bfdbfe; border-radius: 16px; padding: 20px 24px; margin: 20px 0;
+        }
+        .order-amount { font-size: 1.8rem; font-weight: 900; color: #dc2626; }
+        .btn-pay {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white; border: none; padding: 16px 48px;
+            border-radius: 50px; font-size: 1.1rem; font-weight: 700;
+            display: inline-flex; align-items: center; gap: 12px;
+            transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; text-decoration: none;
+        }
+        .btn-pay:hover {
+            transform: translateY(-2px); box-shadow: 0 8px 24px rgba(29,78,216,0.4); color: white;
+        }
+        .step-item {
+            display: flex; align-items: flex-start; gap: 10px;
+            margin-bottom: 10px; font-size: 0.88rem; color: #475569;
+        }
+        .step-num {
+            background: var(--primary); color: white; width: 22px; height: 22px;
+            border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+<div class="payment-card">
+
+    <div class="vnpay-logo">VN<span style="color:#dc2626">Pay</span></div>
+    <p class="text-muted mb-0">Thanh toán khóa học trực tuyến</p>
+
+    <!-- ── LỖI ── -->
+    <div th:if="${errorMessage != null}" class="mt-4">
+        <div class="alert alert-danger d-flex align-items-center gap-2">
+            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+            <span th:text="${errorMessage}">Lỗi không xác định</span>
+        </div>
+        <a href="/" class="btn btn-outline-secondary rounded-pill">
+            <i class="bi bi-house me-1"></i>Về trang chủ
+        </a>
+    </div>
+
+    <!-- ── TRANG THANH TOÁN ── -->
+    <div th:if="${order != null && showPayment == true}">
+
+        <!-- Thông tin đơn hàng -->
+        <div class="order-info-box">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="fw-bold fs-6" style="color:#1e3a8a"
+                         th:text="${order.orderDetails != null and !order.orderDetails.isEmpty()}
+                            ? ${order.orderDetails[0].course.title} : 'Khóa học'">
+                        Tên khóa học
+                    </div>
+                    <div class="small text-muted">Mã đơn: <strong th:text="${order.paymentCode}">ODC00000</strong></div>
+                </div>
+                <div class="text-end">
+                    <div class="order-amount">
+                        <span th:text="${@currencyUtils.formatVnd(order.totalAmount)}">0 ₫</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nút chuyển sang trang thanh toán VNPay -->
+        <div class="text-center mt-4">
+            <a id="btnPay" class="btn-pay" onclick="openVNPay()">
+                <i class="bi bi-qr-code-scan fs-5"></i>
+                Mở thanh toán VNPay
+            </a>
+            <p class="small text-muted mt-3 mb-0">
+                <i class="bi bi-arrow-right-circle me-1"></i>
+                Bấm nút trên → màn hình sẽ chuyển sang trang VNPay để quét mã QR
+            </p>
+        </div>
+
+        <!-- Hướng dẫn -->
+        <div class="mt-4 pt-3 border-top">
+            <h6 class="fw-bold text-dark mb-3"><i class="bi bi-question-circle me-1" style="color:var(--primary)"></i>Hướng dẫn thanh toán</h6>
+            <div class="step-item">
+                <span class="step-num">1</span>
+                <span>Bấm <strong>"Mở thanh toán VNPay"</strong> — trình duyệt chuyển sang trang VNPay</span>
+            </div>
+            <div class="step-item">
+                <span class="step-num">2</span>
+                <span>Mở <strong>app ngân hàng</strong> trên điện thoại (VBuka, TPBank, ACB, VCB...)</span>
+            </div>
+            <div class="step-item">
+                <span class="step-num">3</span>
+                <span>Chọn <strong>Quét mã QR</strong> → quét mã VNPay trên màn hình</span>
+            </div>
+            <div class="step-item">
+                <span class="step-num">4</span>
+                <span>Xác nhận thanh toán trên điện thoại</span>
+            </div>
+            <div class="step-item">
+                <span class="step-num">5</span>
+                <span>Trang sẽ tự chuyển về sau khi thanh toán thành công</span>
+            </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-top text-center">
+            <a href="/" class="btn btn-link text-muted text-decoration-none small">
+                <i class="bi bi-house me-1"></i>Về trang chủ
+            </a>
+        </div>
+    </div>
+
+    <!-- ── TRẠNG THÁI KHÔNG RÕ ── -->
+    <div th:if="${order != null && showPayment == null && errorMessage == null}">
+        <div class="alert alert-info mt-4 text-center">
+            <i class="bi bi-hourglass-split me-2"></i>
+            Trạng thái: <strong th:text="${order.status}">UNKNOWN</strong>
+        </div>
+        <div class="text-center">
+            <a href="/courses" class="btn btn-primary rounded-pill">
+                <i class="bi bi-book me-1"></i>Khám phá khóa học
+            </a>
+        </div>
+    </div>
+
+</div><!-- /payment-card -->
+</div><!-- /container -->
+
+<!-- JavaScript: chuyển hướng sang trang thanh toán VNPay -->
+<script th:if="${paymentUrl != null}">
+    var paymentUrl = /*[[${paymentUrl}]]*/ null;
+    document.getElementById('btnPay').href = paymentUrl;
+</script>
+
+</body>
+</html>

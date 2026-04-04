@@ -1,99 +1,246 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Danh sách Khóa học</title>
+    <title>Danh sách Khóa học | OnlineCourse</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+
+        .course-card {
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        .course-card.visible { opacity: 1; transform: translateY(0); }
+        .course-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(99,102,241,0.15);
+        }
+        .course-img-wrapper { position: relative; height: 180px; overflow: hidden; }
+        .course-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+        .course-card:hover .course-img { transform: scale(1.08); }
+        .price-badge {
+            position: absolute; top: 14px; right: 14px;
+            background: white; padding: 6px 14px; border-radius: 50px;
+            font-weight: 800; font-size: 0.9rem; color: #dc2626;
+            box-shadow: 0 2px 12px rgba(220,38,38,0.2); z-index: 2;
+        }
+        .rating-badge {
+            background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+            color: #4338ca; font-weight: 700; padding: 4px 10px;
+            border-radius: 50px; font-size: 0.8rem;
+            display: inline-flex; align-items: center; gap: 3px;
+        }
+        .btn-cart {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white;
+            border: none; border-radius: 50px; padding: 10px;
+            font-weight: 700; font-size: 0.88rem; transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            width: 100%;
+        }
+        .btn-cart:hover {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.4);
+            color: white;
+        }
+        .btn-view {
+            border: 2px solid #e0e7ff; color: #6366f1; background: transparent;
+            border-radius: 50px; padding: 10px; font-weight: 700; font-size: 0.88rem;
+            transition: all 0.3s ease; width: 100%;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .btn-view:hover { background: #eef2ff; border-color: #6366f1; color: #4338ca; transform: translateY(-2px); }
+        .btn-owned {
+            background: linear-gradient(135deg, #059669, #10b981); color: white;
+            border: none; border-radius: 50px; padding: 10px;
+            font-weight: 700; font-size: 0.88rem; transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%;
+        }
+        .btn-owned:hover {
+            background: linear-gradient(135deg, #047857, #059669);
+            transform: translateY(-2px); box-shadow: 0 6px 20px rgba(5,150,105,0.35); color: white;
+        }
+
+        /* Sidebar */
+        .sidebar-card { border: none; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .sidebar-header {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white;
+            padding: 16px 20px; font-weight: 700; font-size: 1rem;
+        }
+        .cat-item {
+            padding: 12px 20px; display: block; text-decoration: none;
+            color: #475569; font-weight: 500; font-size: 0.9rem;
+            transition: all 0.2s ease; border-bottom: 1px solid #f1f5f9;
+        }
+        .cat-item:hover { background: #f8f7ff; color: #6366f1; padding-left: 24px; }
+        .cat-item.active { color: #6366f1; font-weight: 700; background: #f8f7ff; }
+        .cat-item:last-child { border-bottom: none; }
+
+        /* Filter form */
+        .filter-card { border: none; border-radius: 20px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .filter-btn {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white;
+            border: none; border-radius: 14px; font-weight: 700;
+            transition: all 0.3s ease; padding: 10px;
+        }
+        .filter-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.35); color: white; }
+        .search-input {
+            border: 2px solid #e0e7ff; border-radius: 14px; padding: 10px 16px;
+            font-size: 0.9rem; transition: all 0.3s ease; background: white;
+        }
+        .search-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); outline: none; }
+        .filter-select {
+            border: 2px solid #e0e7ff; border-radius: 14px; padding: 10px 16px;
+            font-size: 0.9rem; transition: all 0.3s ease; background: white;
+        }
+        .filter-select:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); outline: none; }
+
+        /* Page title */
+        .page-title {
+            font-size: 1.8rem; font-weight: 800; color: #0f172a; margin-bottom: 8px;
+        }
+        .page-subtitle { color: #64748b; font-size: 0.95rem; margin-bottom: 0; }
+    </style>
 </head>
-<body class="bg-light">
+<body>
 
 <div th:replace="~{fragments/navbar :: navbar(activePage='courses')}"></div>
 
-<div class="container mt-5">
-    <h2 class="text-center mb-4 fw-bold">Thư viện Khóa học</h2>
-    
-    <div class="row">
-        <!-- Sidebar Danh mục -->
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-primary text-white fw-bold">Danh mục</div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item" th:if="${!#lists.isEmpty(categories)}">
-                        <a th:href="@{'/courses'(q=${q}, minRating=${minRating})}"
-                           class="text-decoration-none fw-semibold"
-                           th:classappend="${categoryId == null} ? 'text-primary' : 'text-dark'">
-                            Tất cả
-                        </a>
-                    </li>
-                    <li class="list-group-item text-muted" th:if="${#lists.isEmpty(categories)}">Trống</li>
-                    <li class="list-group-item" th:each="cat : ${categories}">
-                        <a th:href="@{'/courses'(categoryId=${cat.id}, q=${q}, minRating=${minRating})}"
-                           class="text-decoration-none fw-semibold"
-                           th:classappend="${categoryId == cat.id} ? 'text-primary' : 'text-dark'"
-                           th:text="${cat.name}">Category</a>
-                    </li>
-                </ul>
+<div class="container mt-5 pb-5">
+    <div class="mb-4">
+        <h1 class="page-title">Thư viện Khóa học</h1>
+        <p class="page-subtitle">Khám phá và chọn khóa học phù hợp với bạn</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Sidebar -->
+        <div class="col-lg-3 col-md-4">
+            <div class="sidebar-card mb-4">
+                <div class="sidebar-header">
+                    <i class="bi bi-grid-3x3-gap me-2"></i>Danh mục
+                </div>
+                <div th:if="${#lists.isEmpty(categories)}" class="p-3 text-muted small">Chưa có danh mục</div>
+                <a th:href="@{'/courses'(q=${q}, minRating=${minRating})}"
+                   class="cat-item" th:classappend="${categoryId == null} ? 'active' : ''">
+                    <i class="bi bi-collection me-2"></i>Tất cả khóa học
+                </a>
+                <a th:each="cat : ${categories}"
+                   th:href="@{'/courses'(categoryId=${cat.id}, q=${q}, minRating=${minRating})}"
+                   class="cat-item" th:classappend="${categoryId == cat.id} ? 'active' : ''"
+                   th:text="${cat.name}">Danh mục</a>
+            </div>
+
+            <!-- Filter -->
+            <div class="filter-card p-3">
+                <form method="get" action="/courses">
+                    <input type="hidden" name="categoryId" th:value="${categoryId}">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Tìm kiếm</label>
+                        <input type="text" name="q" class="form-control search-input" placeholder="Tên khóa học..."
+                               th:value="${q}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Đánh giá</label>
+                        <select class="form-select filter-select" name="minRating">
+                            <option value="">Tất cả</option>
+                            <option value="5" th:selected="${minRating == 5}">Từ 5 sao ⭐⭐⭐⭐⭐</option>
+                            <option value="4" th:selected="${minRating == 4}">Từ 4 sao ⭐⭐⭐⭐</option>
+                            <option value="3" th:selected="${minRating == 3}">Từ 3 sao ⭐⭐⭐</option>
+                            <option value="2" th:selected="${minRating == 2}">Từ 2 sao ⭐⭐</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn filter-btn w-100">
+                        <i class="bi bi-funnel me-2"></i>Lọc
+                    </button>
+                </form>
             </div>
         </div>
 
-        <!-- Khóa học -->
-        <div class="col-md-9">
-            <form class="row g-2 mb-3" method="get" action="/courses">
-                <input type="hidden" name="categoryId" th:value="${categoryId}">
-                <div class="col-md-7">
-                    <input type="text" name="q" class="form-control" placeholder="Tìm kiếm khóa học..."
-                           th:value="${q}">
+        <!-- Course Grid -->
+        <div class="col-lg-9 col-md-8">
+            <div class="row g-4">
+                <div th:if="${#lists.isEmpty(courses)}" class="col-12 text-center py-5">
+                    <div class="p-5 bg-white rounded-4 shadow-sm">
+                        <i class="bi bi-journal-x fs-1 text-muted"></i>
+                        <p class="mt-3 text-muted">Không tìm thấy khóa học nào.</p>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <select class="form-select" name="minRating">
-                        <option th:selected="${minRating == null}" value="">Chọn đánh giá</option>
-                        <option value="5" th:selected="${minRating == 5}">Từ 5 sao</option>
-                        <option value="4" th:selected="${minRating == 4}">Từ 4 sao</option>
-                        <option value="3" th:selected="${minRating == 3}">Từ 3 sao</option>
-                        <option value="2" th:selected="${minRating == 2}">Từ 2 sao</option>
-                        <option value="1" th:selected="${minRating == 1}">Từ 1 sao</option>
-                    </select>
-                </div>
-                <div class="col-md-2 d-grid">
-                    <button type="submit" class="btn btn-primary">Lọc</button>
-                </div>
-            </form>
-            <div class="row">
-                <div th:if="${#lists.isEmpty(courses)}" class="col-12"><p class="text-muted text-center mt-5">Chưa có khóa học nào</p></div>
-                
-                <div class="col-md-4 mb-4" th:each="course : ${courses}">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img th:src="${course.image}" class="card-img-top" alt="Course Image" style="height: 180px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/400x180/6366f1/ffffff?text=No+Image'">
+
+                <div class="col-lg-4 col-md-6" th:each="course, iter : ${courses}">
+                    <div class="card course-card h-100">
+                        <div class="course-img-wrapper">
+                            <img th:src="${course.image}" class="course-img" alt="Course Image"
+                                 onerror="this.src='https://via.placeholder.com/600x400/6366f1/ffffff?text=No+Image'">
+                            <div class="price-badge" th:text="${#numbers.formatDecimal(course.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</div>
+                        </div>
                         <div class="card-body d-flex flex-column">
-                            <h5 class="card-title fw-bold" th:text="${course.title}"></h5>
-                            <p class="card-text text-muted small" th:text="${course.category != null ? course.category.name : 'Khác'}"></p>
-                            <div class="text-muted small mb-2" th:if="${courseAvgRatings[course.id] != null}">
-                                <i class="bi bi-star-fill text-warning me-1"></i>
-                                <span th:text="${#numbers.formatDecimal(courseAvgRatings[course.id], 1, 'POINT', 1, 'POINT')}">5.0</span>
+                            <h5 style="font-size:0.95rem; font-weight:700; color:#0f172a; margin-bottom:6px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; min-height:2.4rem;"
+                                th:text="${course.title}">Tiêu đề</h5>
+                            <p style="font-size:0.82rem; color:#64748b; margin-bottom:10px;"
+                               th:text="${course.category != null ? course.category.name : 'Khác'}">Danh mục</p>
+
+                            <div class="mb-auto">
+                                <span class="rating-badge" th:if="${courseAvgRatings[course.id] != null}">
+                                    <i class="bi bi-star-fill" style="color:#f59e0b; font-size:0.7rem;"></i>
+                                    <span th:text="${#numbers.formatDecimal(courseAvgRatings[course.id], 1, 'POINT', 1, 'POINT')}">5.0</span>
+                                </span>
+                                <span class="text-muted small" th:if="${courseAvgRatings[course.id] != null}"
+                                      th:text="'(+) ' + ${courseReviewCounts != null && courseReviewCounts[course.id] != null ? courseReviewCounts[course.id] : 0} + ' đánh giá'">(0 đánh giá)</span>
+                                <span class="text-muted small" th:if="${courseAvgRatings[course.id] == null}">Chưa có đánh giá</span>
                             </div>
-                            <div class="text-muted small mb-2" th:if="${courseAvgRatings[course.id] == null}">
-                                Chưa có đánh giá
-                            </div>
-                            <div class="mt-auto">
-                                <h5 class="text-danger fw-bold mb-2" th:text="${course.price} + ' $'"></h5>
-                                <form th:if="${isLogged && !isAdmin}" th:action="@{'/cart/add/' + ${course.id}}" method="POST" class="mb-2">
-                                    <button type="submit" class="btn btn-danger w-100 rounded-pill fw-bold">
-                                        <i class="bi bi-cart-plus me-1"></i>Thêm vào giỏ hàng
-                                    </button>
-                                </form>
-                                <a th:href="@{'/courses/' + ${course.id}}" class="btn btn-outline-primary w-100 rounded-pill fw-semibold">
-                                    <i class="bi bi-search me-1"></i>Khám phá ngay
-                                </a>
+
+                            <div class="mt-3 pt-3 border-top">
+                                <!-- Đã mua -->
+                                <div th:if="${purchasedCourseIds != null && purchasedCourseIds.contains(course.id)}">
+                                    <a th:href="@{'/courses/' + ${course.id}}"
+                                       class="btn-owned text-decoration-none fw-bold"
+                                       style="border-radius:50px; padding:10px; font-size:0.88rem; display:flex; align-items:center; justify-content:center; gap:6px;">
+                                        <i class="bi bi-check-circle-fill"></i>Đã sở hữu — Xem khóa học
+                                    </a>
+                                </div>
+                                <!-- Chưa mua -->
+                                <div th:if="${purchasedCourseIds == null || !purchasedCourseIds.contains(course.id)}"
+                                     class="d-flex flex-column gap-2">
+                                    <form th:if="${isLogged && !isAdmin}"
+                                          th:action="@{'/cart/add/' + ${course.id}}" method="POST">
+                                        <button type="submit" class="btn-cart">
+                                            <i class="bi bi-cart-plus"></i>Thêm vào giỏ
+                                        </button>
+                                    </form>
+                                    <a th:href="@{'/courses/' + ${course.id}}"
+                                       class="btn-view text-decoration-none fw-bold"
+                                       style="border-radius:50px; padding:10px; font-size:0.88rem; display:flex; align-items:center; justify-content:center; gap:6px;">
+                                        <i class="bi bi-search"></i>Chi tiết khóa học
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
             </div>
         </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => entry.target.classList.add('visible'), i * 80);
+            }
+        });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.course-card').forEach(el => observer.observe(el));
+</script>
 </body>
 </html>

@@ -8,6 +8,7 @@ import Nhom100.DoAnJ2EE.repository.CourseReviewRepository;
 import Nhom100.DoAnJ2EE.repository.CategoryRepository;
 import Nhom100.DoAnJ2EE.repository.OrderDetailRepository;
 import Nhom100.DoAnJ2EE.repository.UserRepository;
+import Nhom100.DoAnJ2EE.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,8 +19,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,6 +45,9 @@ public class CourseWebController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CartService cartService;
+
     private Long getAuthenticatedUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated()
@@ -58,6 +65,8 @@ public class CourseWebController {
         boolean isLogged = false;
         String userDisplayName = null;
         String userHandle = null;
+        User currentUser = null;
+
         if (auth != null && auth.isAuthenticated()
                 && !"anonymousUser".equals(auth.getPrincipal().toString())) {
             isLogged = true;
@@ -65,11 +74,16 @@ public class CourseWebController {
                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
             userDisplayName = auth.getName();
             userHandle = "@" + auth.getName();
+            currentUser = userRepository.findByEmail(auth.getName()).orElse(null);
         }
+
+        int cartItemCount = (currentUser != null) ? cartService.getCartItemCount(currentUser) : 0;
+
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("isLogged", isLogged);
         model.addAttribute("userDisplayName", userDisplayName);
         model.addAttribute("userHandle", userHandle);
+        model.addAttribute("cartItemCount", cartItemCount);
     }
 
     private boolean hasPurchased(Long userId, Long courseId) {
@@ -88,8 +102,10 @@ public class CourseWebController {
                 : courseRepository.findAll();
 
         Map<Long, Double> courseAvgRatings = new HashMap<>();
+        Map<Long, Long> courseReviewCounts = new HashMap<>();
         for (CourseReviewRepository.CourseRatingSummary s : courseReviewRepository.findCourseRatings()) {
             courseAvgRatings.put(s.getCourseId(), s.getAvgRating());
+            courseReviewCounts.put(s.getCourseId(), s.getTotalReviews());
         }
 
         String qNorm = q != null ? q.trim().toLowerCase() : null;
@@ -119,6 +135,21 @@ public class CourseWebController {
         model.addAttribute("courses", courses);
         model.addAttribute("categories", categoryRepository.findAll());
         model.addAttribute("courseAvgRatings", courseAvgRatings);
+        model.addAttribute("courseReviewCounts", courseReviewCounts);
+
+        // purchasedCourseIds cho trang danh sách
+        Set<Long> purchasedCourseIds = new HashSet<>();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            User user = userRepository.findByEmail(auth.getName()).orElse(null);
+            if (user != null) {
+                purchasedCourseIds = orderDetailRepository.findByOrderUserId(user.getId()).stream()
+                        .filter(od -> od.getOrder() != null && "COMPLETED".equals(od.getOrder().getStatus()))
+                        .map(od -> od.getCourse().getId())
+                        .collect(Collectors.toSet());
+            }
+        }
+        model.addAttribute("purchasedCourseIds", purchasedCourseIds);
         model.addAttribute("categoryId", categoryId);
         model.addAttribute("minRating", minRating);
         model.addAttribute("q", q);

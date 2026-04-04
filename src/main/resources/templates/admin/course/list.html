@@ -71,7 +71,7 @@
                                 </div>
                             </td>
                             <td>
-                                <span class="badge badge-price px-3 py-2" th:text="${course.price} + ' $'">0 $</span>
+                                <span class="badge badge-price px-3 py-2" th:text="${#numbers.formatDecimal(course.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</span>
                             </td>
                             <td class="text-end pe-4">
                                 <div class="btn-group gap-2">

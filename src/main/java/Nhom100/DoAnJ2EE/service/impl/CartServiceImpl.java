@@ -1,5 +1,6 @@
 package Nhom100.DoAnJ2EE.service.impl;
 
+import Nhom100.DoAnJ2EE.config.VNPayConfig;
 import Nhom100.DoAnJ2EE.dto.OrderResponse;
 import Nhom100.DoAnJ2EE.entity.*;
 import Nhom100.DoAnJ2EE.repository.*;
@@ -10,8 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -31,6 +35,9 @@ public class CartServiceImpl implements CartService {
     @Autowired
     private OrderDetailRepository orderDetailRepository;
 
+    @Autowired
+    private VNPayConfig vnPayConfig;
+
     @Override
     public Cart getCartByUser(User user) {
         return cartRepository.findByUserId(user.getId())
@@ -39,6 +46,12 @@ public class CartServiceImpl implements CartService {
                     newCart.setUser(user);
                     return cartRepository.save(newCart);
                 });
+    }
+
+    @Override
+    public int getCartItemCount(User user) {
+        Cart cart = getCartByUser(user);
+        return (int) cartItemRepository.countByCartId(cart.getId());
     }
 
     @Override
@@ -129,5 +142,59 @@ public class CartServiceImpl implements CartService {
         cartRepository.save(cart);
 
         return responses;
+    }
+
+    @Override
+    @Transactional
+    public void clearCart(User user) {
+        Cart cart = getCartByUser(user);
+        if (cart == null || cart.getItems().isEmpty()) return;
+        cartItemRepository.deleteAll(cart.getItems());
+        cart.getItems().clear();
+        cart.updateTotalPrice();
+        cartRepository.save(cart);
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> checkoutVNPay(User user, String ipAddress) {
+        Cart cart = getCartByUser(user);
+        if (cart.getItems().isEmpty()) {
+            throw new IllegalStateException("Giỏ hàng trống");
+        }
+
+        // Sinh mã thanh toán
+        String paymentCode = "ODC" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+
+        // Tạo đơn hàng PENDING
+        Order order = new Order();
+        order.setUser(user);
+        order.setTotalAmount(cart.getTotalAmount());
+        order.setStatus("PENDING");
+        order.setPaymentType("VNPAY");
+        order.setPaymentCode(paymentCode);
+        order.setOrderDate(LocalDateTime.now());
+        Order savedOrder = orderRepository.save(order);
+
+        // Lưu OrderDetail cho từng khóa học
+        List<String> courseTitles = new ArrayList<>();
+        for (CartItem item : cart.getItems()) {
+            if (!orderDetailRepository.existsByOrderUserIdAndCourseId(user.getId(), item.getCourse().getId())) {
+                OrderDetail detail = new OrderDetail(savedOrder, item.getCourse(), item.getCourse().getPrice());
+                orderDetailRepository.save(detail);
+                courseTitles.add(item.getCourse().getTitle());
+            }
+        }
+
+        // Tạo URL thanh toán VNPay — quy đổi USD → VND
+        long amountVnd = vnPayConfig.convertToVnd(cart.getTotalAmount());
+        String paymentUrl = vnPayConfig.createPaymentUrl(amountVnd, paymentCode, paymentCode, ipAddress);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("orderId", savedOrder.getId());
+        result.put("paymentCode", paymentCode);
+        result.put("paymentUrl", paymentUrl);
+        result.put("amount", cart.getTotalAmount());
+        return result;
     }
 }

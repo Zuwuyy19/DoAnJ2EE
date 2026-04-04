@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByUserId(Long userId);
+    java.util.Optional<Order> findByPaymentCode(String paymentCode);
 
     interface MonthlyRevenueSummary {
         Integer getYear();

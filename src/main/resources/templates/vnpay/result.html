@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả thanh toán</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root { --primary: #6366f1; }
+        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+        .result-card {
+            background: white;
+            border-radius: 20px;
+            padding: 48px 40px;
+            max-width: 480px;
+            margin: 80px auto;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .icon-success {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            background: #dcfce7;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px;
+        }
+        .icon-success i { font-size: 2.5rem; color: #16a34a; }
+        .icon-fail {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            background: #fee2e2;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px;
+        }
+        .icon-fail i { font-size: 2.5rem; color: #dc2626; }
+        .result-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; }
+        .result-message { color: #6b7280; font-size: 0.95rem; margin-bottom: 28px; }
+        .btn-primary-custom {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 36px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s;
+        }
+        .btn-primary-custom:hover { background: #4f46e5; color: white; }
+        .btn-outline-custom {
+            border: 2px solid #e5e7eb;
+            color: #6b7280;
+            padding: 10px 32px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            margin-left: 10px;
+            transition: all 0.2s;
+        }
+        .btn-outline-custom:hover { border-color: var(--primary); color: var(--primary); }
+    </style>
+</head>
+<body>
+
+<div class="result-card">
+
+    <!-- Thành công -->
+    <div th:if="${success == true}">
+        <div class="icon-success">
+            <i class="bi bi-check-lg"></i>
+        </div>
+        <div class="result-title text-success">Thanh toán thành công!</div>
+        <div class="result-message" th:text="${message}">Bạn đã có quyền truy cập khóa học.</div>
+
+        <a th:if="${redirectUrl != null}" th:href="${redirectUrl}"
+           class="btn-primary-custom">
+            <i class="bi bi-play-fill me-2"></i>Vào học ngay
+        </a>
+        <a href="/" class="btn-outline-custom">
+            <i class="bi bi-house me-1"></i>Trang chủ
+        </a>
+    </div>
+
+    <!-- Thất bại -->
+    <div th:if="${success == false}">
+        <div class="icon-fail">
+            <i class="bi bi-x-lg"></i>
+        </div>
+        <div class="result-title text-danger">Thanh toán thất bại!</div>
+        <div class="result-message" th:text="${message}">Vui lòng thử lại.</div>
+
+        <a href="/" class="btn-outline-custom">
+            <i class="bi bi-house me-1"></i>Về trang chủ
+        </a>
+    </div>
+
+</div>
+
+<script th:if="${success == true && redirectUrl != null}">
+    setTimeout(function() {
+        window.location.href = "/";
+    }, 5000);
+</script>
+
+</body>
+</html>

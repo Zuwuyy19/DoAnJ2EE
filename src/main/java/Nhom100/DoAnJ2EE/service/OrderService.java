@@ -2,13 +2,17 @@ package Nhom100.DoAnJ2EE.service;
 
 import Nhom100.DoAnJ2EE.dto.CreateOrderRequest;
 import Nhom100.DoAnJ2EE.dto.OrderResponse;
+import Nhom100.DoAnJ2EE.entity.Order;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Interface Service cho chức năng Order (quản lý đơn hàng mua khóa học)
  * Định nghĩa các method nghiệp vụ cần thiết:
  * - Tạo đơn hàng mới (mua khóa học)
  * - Lấy danh sách khóa học đã mua của một user
+ * - Tạo đơn hàng VNPay (chờ thanh toán)
+ * - Xử lý phản hồi VNPay (cập nhật trạng thái đơn)
  */
 public interface OrderService {
 
@@ -28,4 +32,27 @@ public interface OrderService {
      * @return Danh sách OrderResponse chứa thông tin các khóa học đã mua
      */
     List<OrderResponse> getMyCourses(Long userId);
+
+    /**
+     * Tạo đơn hàng chờ thanh toán VNPay
+     * Sinh mã thanh toán, lưu order PENDING, trả về URL thanh toán VNPay
+     * @param userId ID người dùng
+     * @param courseId ID khóa học
+     * @param ipAddress IP người dùng
+     * @return Map chứa orderId, paymentCode, paymentUrl
+     */
+    Map<String, Object> createVNPayOrder(Long userId, Long courseId, String ipAddress);
+
+    /**
+     * Xử lý phản hồi thành công từ VNPay (return URL)
+     * Xác minh hash, cập nhật order → PAID nếu hợp lệ
+     * @param params toàn bộ params từ VNPay gửi về
+     * @return Order đã cập nhật, hoặc null nếu thất bại
+     */
+    Order handleVNPayReturn(Map<String, String> params);
+
+    /**
+     * Tìm đơn hàng theo ID
+     */
+    Order getOrderById(Long orderId);
 }

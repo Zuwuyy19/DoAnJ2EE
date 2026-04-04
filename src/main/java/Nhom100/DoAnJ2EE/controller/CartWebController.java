@@ -1,10 +1,13 @@
 package Nhom100.DoAnJ2EE.controller;
 
+import Nhom100.DoAnJ2EE.config.VNPayConfig;
 import Nhom100.DoAnJ2EE.entity.Cart;
 import Nhom100.DoAnJ2EE.entity.User;
 import Nhom100.DoAnJ2EE.repository.UserRepository;
 import Nhom100.DoAnJ2EE.service.CartService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Map;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -16,21 +19,17 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/cart")
 public class CartWebController {
 
-    @Autowired
-    private CartService cartService;
+    @Autowired private CartService cartService;
+    @Autowired private UserRepository userRepository;
+    @Autowired private VNPayConfig vnPayConfig;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    private User getAuthenticatedUser() {
+    private User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
-            String email = auth.getName();
-            return userRepository.findByEmail(email).orElse(null);
-        }
-        return null;
+        if (auth == null || !auth.isAuthenticated()
+                || "anonymousUser".equals(auth.getPrincipal())) return null;
+        return userRepository.findByEmail(auth.getName()).orElse(null);
     }
-    
+
     private void addAuthAttributes(Model model, User user) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = false;
@@ -51,7 +50,7 @@ public class CartWebController {
 
     @GetMapping
     public String viewCart(Model model) {
-        User user = getAuthenticatedUser();
+        User user = getCurrentUser();
         if (user == null) {
             return "redirect:/login";
         }
@@ -64,7 +63,7 @@ public class CartWebController {
 
     @PostMapping("/add/{courseId}")
     public String addToCart(@PathVariable Long courseId, RedirectAttributes redirectAttributes) {
-        User user = getAuthenticatedUser();
+        User user = getCurrentUser();
         if (user == null) {
             return "redirect:/login";
         }
@@ -81,7 +80,7 @@ public class CartWebController {
 
     @PostMapping("/remove/{itemId}")
     public String removeFromCart(@PathVariable Long itemId) {
-        User user = getAuthenticatedUser();
+        User user = getCurrentUser();
         if (user == null) {
             return "redirect:/login";
         }
@@ -92,7 +91,7 @@ public class CartWebController {
 
     @PostMapping("/checkout")
     public String checkout(RedirectAttributes redirectAttributes) {
-        User user = getAuthenticatedUser();
+        User user = getCurrentUser();
         if (user == null) {
             return "redirect:/login";
         }
@@ -105,5 +104,43 @@ public class CartWebController {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/cart";
         }
+    }
+
+    // ── Thanh toán VNPay - redirect trực tiếp sang sandbox ──
+    @PostMapping("/checkout-vnpay")
+    public String checkoutVNPay(RedirectAttributes redirectAttributes,
+                                HttpServletRequest request) {
+        User user = getCurrentUser();
+        if (user == null) return "redirect:/login";
+        try {
+            String ipAddress = getClientIp(request);
+            Map<String, Object> result = cartService.checkoutVNPay(user, ipAddress);
+
+            String paymentCode = (String) result.get("paymentCode");
+            Double amount = (Double) result.get("amount");
+            // Giá đã lưu trực tiếp là VND
+            long amountVnd = vnPayConfig.convertToVnd(amount);
+
+            // Build URL VNPay với HMAC-SHA512
+            String paymentUrl = vnPayConfig.createPaymentUrl(amountVnd, paymentCode, paymentCode, ipAddress);
+
+            return "redirect:" + paymentUrl;
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/cart";
+        }
+    }
+
+    private String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip))
+            ip = request.getHeader("Proxy-Client-IP");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip))
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip))
+            ip = request.getRemoteAddr();
+        if (ip != null && ip.contains(",")) ip = ip.split(",")[0].trim();
+        return ip;
     }
 }
