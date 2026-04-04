@@ -28,6 +28,7 @@ D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\entity\CartItem.java
 D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\entity\Category.java
 D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\entity\Chapter.java
 D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\entity\Course.java
+D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\entity\CourseReview.java
 D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\entity\Lesson.java
 D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\entity\Order.java
 D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\entity\OrderDetail.java
@@ -38,6 +39,7 @@ D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\repository\CartRepository.java
 D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\repository\CategoryRepository.java
 D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\repository\ChapterRepository.java
 D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\repository\CourseRepository.java
+D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\repository\CourseReviewRepository.java
 D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\repository\LessonRepository.java
 D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\repository\OrderDetailRepository.java
 D:\DoAnJ2EE\src\main\java\Nhom100\DoAnJ2EE\repository\OrderRepository.java
