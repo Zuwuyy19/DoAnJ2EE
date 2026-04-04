@@ -186,15 +186,38 @@ public class AdminController {
         return "redirect:/admin/courses/" + courseId + "/content";
     }
 
+    @GetMapping("/courses/{courseId}/chapters/{chapterId}/lessons/{lessonId}/edit")
+    public String showEditLesson(@PathVariable Long courseId,
+            @PathVariable Long chapterId,
+            @PathVariable Long lessonId,
+            Model model) {
+        Course course = courseService.getCourseById(courseId).orElse(null);
+        Chapter chapter = chapterRepository.findById(chapterId).orElse(null);
+        Lesson lesson = lessonRepository.findById(lessonId).orElse(null);
+        if (course == null || chapter == null || lesson == null)
+            return "redirect:/admin/courses/" + courseId + "/content";
+        model.addAttribute("course", course);
+        model.addAttribute("chapter", chapter);
+        model.addAttribute("lesson", lesson);
+        return "admin/course/lesson-edit";
+    }
+
     @PostMapping("/courses/{courseId}/chapters/{chapterId}/lessons/{lessonId}/update")
     public String updateLesson(@PathVariable Long courseId,
             @PathVariable Long chapterId,
             @PathVariable Long lessonId,
-            @RequestParam String title) {
+            @RequestParam String title,
+            @RequestParam(required = false) MultipartFile lessonFile) {
         Lesson lesson = lessonRepository.findById(lessonId).orElse(null);
         if (lesson == null)
             return "redirect:/admin/courses/" + courseId + "/content";
         lesson.setTitle(title);
+        if (lessonFile != null && !lessonFile.isEmpty()) {
+            String fileName = saveUploadedFile(lessonFile, "lessons");
+            if (fileName != null) {
+                lesson.setVideoUrl("/uploads/lessons/" + fileName);
+            }
+        }
         lessonRepository.save(lesson);
         return "redirect:/admin/courses/" + courseId + "/content";
     }
