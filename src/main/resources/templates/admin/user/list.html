@@ -70,10 +70,16 @@
                                     <a th:href="@{'/admin/users/edit/' + ${user.id}}" class="btn btn-sm btn-outline-primary rounded-pill px-3 me-2">
                                         <i class="bi bi-pencil-square me-1"></i>Sửa
                                     </a>
-                                    <a th:if="${user.enabled}" th:href="@{'/admin/users/delete/' + ${user.id}}" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="return confirm('Bạn có chắc chắn muốn KHÓA tài khoản này?')">
-                                        <i class="bi bi-lock me-1"></i>Khóa
-                                    </a>
-                                    <span th:if="${!user.enabled}" class="text-muted small italic">Đã bị khóa</span>
+                                    <form th:if="${user.enabled}" th:action="@{'/admin/users/' + ${user.id} + '/toggle'}" method="post">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="return confirm('Bạn có chắc chắn muốn KHÓA tài khoản này?')">
+                                            <i class="bi bi-lock me-1"></i>Khóa
+                                        </button>
+                                    </form>
+                                    <form th:if="${!user.enabled}" th:action="@{'/admin/users/' + ${user.id} + '/toggle'}" method="post">
+                                        <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                                            <i class="bi bi-unlock me-1"></i>Mở khóa
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
