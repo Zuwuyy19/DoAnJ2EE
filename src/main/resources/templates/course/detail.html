@@ -213,7 +213,7 @@
             </div>
 
             <div class="chapter-card" th:each="chapter, chStat : ${course.chapters}" th:classappend="${chStat.index == 0} ? 'open'">
-                <div class="chapter-header" th:onclick="(isPurchased || isAdmin) ? toggleChapter(this) : null">
+                <div class="chapter-header" th:onclick="([[${isPurchased}]] || [[${isAdmin}]]) ? toggleChapter(this) : null">
                     <div>
                         <div class="ch-title">
                             <i class="bi bi-folder2-open me-2 text-warning"></i>
@@ -231,7 +231,7 @@
                         <li class="lesson-item" th:each="lesson : ${chapter.lessons}">
                             <i class="bi bi-play-circle lesson-icon"></i>
                             <span class="lesson-title" th:text="${lesson.title}">Tên bài học</span>
-                            <button class="btn-trial" th:if="${isPurchased || isAdmin}" th:onclick="'playLesson(' + ${lesson.id} + ')'">Xem</button>
+                            <button class="btn-trial" th:if="${isPurchased || isAdmin}" th:attr="onclick='window.location.href=&quot;/learn/' + ${lesson.id} + '&quot;'">Xem</button>
                         </li>
                     </ul>
                 </div>
@@ -296,7 +296,7 @@
                         <img th:src="${rc.image}" onerror="this.src='https://via.placeholder.com/300x140/6366f1/ffffff?text=Course'">
                         <div class="card-body">
                             <div class="card-title" th:text="${rc.title}">Khóa học liên quan</div>
-                            <div class="card-price" th:text="${rc.price} + ' $'">$0</div>
+                            <div class="card-price" th:text="${#numbers.formatDecimal(rc.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</div>
                         </div>
                     </a>
                 </div>
@@ -317,7 +317,7 @@
                 <!-- USER -->
                 <div class="card border-0 shadow-lg rounded-3 overflow-hidden" th:if="${!isAdmin}">
                     <div class="card-body text-center p-4">
-                        <h1 class="text-danger fw-black mb-3 display-5 fw-bold" th:text="${course.price} + ' $'">$0</h1>
+                        <h1 class="text-danger fw-black mb-3 display-5 fw-bold" th:text="${#numbers.formatDecimal(course.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</h1>
 
                         <!-- Chưa mua -->
                         <div th:if="${!isPurchased}">
@@ -344,10 +344,10 @@
 
                         <!-- Đã mua -->
                         <div th:if="${isPurchased}">
-                            <button class="btn btn-success btn-lg w-100 mb-3 fw-bold rounded-pill shadow-sm"
-                                    onclick="alert('Trình xem bài học đang phát triển!')">
+                            <a th:href="@{'/learn/' + ${course.id}}"
+                               class="btn btn-success btn-lg w-100 mb-3 fw-bold rounded-pill shadow-sm text-white text-decoration-none">
                                 <i class="bi bi-play-fill me-2"></i>Vào học ngay
-                            </button>
+                            </a>
                             <span class="badge bg-success rounded-pill px-3 py-2">
                                 <i class="bi bi-check-circle-fill me-1"></i>Đã mua
                             </span>
@@ -372,7 +372,7 @@
                         <span class="badge bg-warning text-dark px-3 py-2 mb-3 rounded-pill">
                             <i class="bi bi-gear-fill me-1"></i>Chế độ quản trị
                         </span>
-                        <h1 class="text-secondary mb-3 display-5 fw-bold" th:text="${course.price} + ' $'">$0</h1>
+                        <h1 class="text-secondary mb-3 display-5 fw-bold" th:text="${#numbers.formatDecimal(course.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</h1>
                         <a th:href="@{'/admin/courses/edit/' + ${course.id}}"
                            class="btn btn-warning btn-lg w-100 mb-3 fw-bold rounded-pill text-white">
                             <i class="bi bi-pencil-square me-2"></i>Chỉnh sửa khóa học
@@ -403,7 +403,7 @@
     }
 
     function playLesson(id) {
-        alert('Trình xem bài học #' + id + ' đang được phát triển!');
+        window.location.href = '/learn/' + id;
     }
 </script>
 </body>

@@ -19,8 +19,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -99,8 +102,10 @@ public class CourseWebController {
                 : courseRepository.findAll();
 
         Map<Long, Double> courseAvgRatings = new HashMap<>();
+        Map<Long, Long> courseReviewCounts = new HashMap<>();
         for (CourseReviewRepository.CourseRatingSummary s : courseReviewRepository.findCourseRatings()) {
             courseAvgRatings.put(s.getCourseId(), s.getAvgRating());
+            courseReviewCounts.put(s.getCourseId(), s.getTotalReviews());
         }
 
         String qNorm = q != null ? q.trim().toLowerCase() : null;
@@ -130,6 +135,21 @@ public class CourseWebController {
         model.addAttribute("courses", courses);
         model.addAttribute("categories", categoryRepository.findAll());
         model.addAttribute("courseAvgRatings", courseAvgRatings);
+        model.addAttribute("courseReviewCounts", courseReviewCounts);
+
+        // purchasedCourseIds cho trang danh sách
+        Set<Long> purchasedCourseIds = new HashSet<>();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            User user = userRepository.findByEmail(auth.getName()).orElse(null);
+            if (user != null) {
+                purchasedCourseIds = orderDetailRepository.findByOrderUserId(user.getId()).stream()
+                        .filter(od -> od.getOrder() != null && "COMPLETED".equals(od.getOrder().getStatus()))
+                        .map(od -> od.getCourse().getId())
+                        .collect(Collectors.toSet());
+            }
+        }
+        model.addAttribute("purchasedCourseIds", purchasedCourseIds);
         model.addAttribute("categoryId", categoryId);
         model.addAttribute("minRating", minRating);
         model.addAttribute("q", q);

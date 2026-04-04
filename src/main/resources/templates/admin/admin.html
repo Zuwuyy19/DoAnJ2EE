@@ -122,7 +122,7 @@
                             <li class="list-group-item d-flex justify-content-between align-items-center"
                                 th:each="item : ${topCourses}">
                                 <span th:text="${item.title}">Course</span>
-                                <span class="badge bg-light text-dark border" th:text="${item.revenue} + ' $'">0</span>
+                                <span class="badge bg-light text-dark border" th:text="${#numbers.formatDecimal(item.revenue, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</span>
                             </li>
                             <li class="list-group-item text-muted" th:if="${#lists.isEmpty(topCourses)}">Chưa có dữ liệu</li>
                         </ul>
@@ -137,7 +137,7 @@
                             <li class="list-group-item d-flex justify-content-between align-items-center"
                                 th:each="item : ${topUsers}">
                                 <span th:text="${item.email}">user@email.com</span>
-                                <span class="badge bg-light text-dark border" th:text="${item.revenue} + ' $'">0</span>
+                                <span class="badge bg-light text-dark border" th:text="${#numbers.formatDecimal(item.revenue, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</span>
                             </li>
                             <li class="list-group-item text-muted" th:if="${#lists.isEmpty(topUsers)}">Chưa có dữ liệu</li>
                         </ul>
