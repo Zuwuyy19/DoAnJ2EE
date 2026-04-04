@@ -19,9 +19,19 @@
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-primary text-white fw-bold">Danh mục</div>
                 <ul class="list-group list-group-flush">
+                    <li class="list-group-item" th:if="${!#lists.isEmpty(categories)}">
+                        <a th:href="@{'/courses'(q=${q}, minRating=${minRating})}"
+                           class="text-decoration-none fw-semibold"
+                           th:classappend="${categoryId == null} ? 'text-primary' : 'text-dark'">
+                            Tất cả
+                        </a>
+                    </li>
                     <li class="list-group-item text-muted" th:if="${#lists.isEmpty(categories)}">Trống</li>
                     <li class="list-group-item" th:each="cat : ${categories}">
-                        <a href="#" class="text-decoration-none text-dark fw-semibold" th:text="${cat.name}">Category</a>
+                        <a th:href="@{'/courses'(categoryId=${cat.id}, q=${q}, minRating=${minRating})}"
+                           class="text-decoration-none fw-semibold"
+                           th:classappend="${categoryId == cat.id} ? 'text-primary' : 'text-dark'"
+                           th:text="${cat.name}">Category</a>
                     </li>
                 </ul>
             </div>
@@ -29,6 +39,26 @@
 
         <!-- Khóa học -->
         <div class="col-md-9">
+            <form class="row g-2 mb-3" method="get" action="/courses">
+                <input type="hidden" name="categoryId" th:value="${categoryId}">
+                <div class="col-md-7">
+                    <input type="text" name="q" class="form-control" placeholder="Tìm kiếm khóa học..."
+                           th:value="${q}">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="minRating">
+                        <option th:selected="${minRating == null}" value="">Chọn đánh giá</option>
+                        <option value="5" th:selected="${minRating == 5}">Từ 5 sao</option>
+                        <option value="4" th:selected="${minRating == 4}">Từ 4 sao</option>
+                        <option value="3" th:selected="${minRating == 3}">Từ 3 sao</option>
+                        <option value="2" th:selected="${minRating == 2}">Từ 2 sao</option>
+                        <option value="1" th:selected="${minRating == 1}">Từ 1 sao</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-primary">Lọc</button>
+                </div>
+            </form>
             <div class="row">
                 <div th:if="${#lists.isEmpty(courses)}" class="col-12"><p class="text-muted text-center mt-5">Chưa có khóa học nào</p></div>
                 
@@ -38,6 +68,13 @@
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title fw-bold" th:text="${course.title}"></h5>
                             <p class="card-text text-muted small" th:text="${course.category != null ? course.category.name : 'Khác'}"></p>
+                            <div class="text-muted small mb-2" th:if="${courseAvgRatings[course.id] != null}">
+                                <i class="bi bi-star-fill text-warning me-1"></i>
+                                <span th:text="${#numbers.formatDecimal(courseAvgRatings[course.id], 1, 'POINT', 1, 'POINT')}">5.0</span>
+                            </div>
+                            <div class="text-muted small mb-2" th:if="${courseAvgRatings[course.id] == null}">
+                                Chưa có đánh giá
+                            </div>
                             <div class="mt-auto">
                                 <h5 class="text-danger fw-bold mb-2" th:text="${course.price} + ' $'"></h5>
                                 <form th:if="${isLogged && !isAdmin}" th:action="@{'/cart/add/' + ${course.id}}" method="POST" class="mb-2">

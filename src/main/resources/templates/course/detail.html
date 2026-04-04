@@ -111,6 +111,22 @@
             background: #f59e0b; color: white; font-weight: 700;
             padding: 3px 12px; border-radius: 20px; font-size: 0.75rem;
         }
+        /* â”€â”€ REVIEWS â”€â”€ */
+        .review-card {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid #e8eaf0;
+            padding: 16px 18px;
+        }
+        .review-meta { color: #6b7280; font-size: 0.85rem; }
+        .rating-badge {
+            background: #eef2ff;
+            color: #4f46e5;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+        }
     </style>
 </head>
 <body>
@@ -219,6 +235,55 @@
                         </li>
                     </ul>
                 </div>
+            </div>
+
+            <!-- Đánh giá & bình luận -->
+            <h2 class="section-title mt-5">Đánh giá & bình luận</h2>
+            <div class="mb-4">
+                <div class="review-card mb-3" th:if="${#lists.isEmpty(courseReviews)}">
+                    <div class="text-muted">Chưa có đánh giá nào.</div>
+                </div>
+                <div class="review-card mb-3" th:each="rv : ${courseReviews}">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="fw-bold" th:text="${rv.user.fullname != null && !#strings.isEmpty(rv.user.fullname) ? rv.user.fullname : rv.user.email}">
+                            User
+                        </div>
+                        <span class="rating-badge" th:text="${rv.rating} + '/5'">5/5</span>
+                    </div>
+                    <div class="review-meta mb-2" th:text="${rv.updatedAt}">01/01/2026 10:00</div>
+                    <div th:text="${rv.comment}">Bình luận</div>
+                </div>
+            </div>
+
+            <div class="review-card mb-4" th:if="${isLogged && isPurchased}">
+                <form th:action="@{'/courses/' + ${course.id} + '/reviews'}" method="post" class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Điểm đánh giá</label>
+                        <select name="rating" class="form-select" required>
+                            <option value="5" th:selected="${existingReview != null && existingReview.rating == 5}">5 - Xuất sắc</option>
+                            <option value="4" th:selected="${existingReview != null && existingReview.rating == 4}">4 - Tốt</option>
+                            <option value="3" th:selected="${existingReview != null && existingReview.rating == 3}">3 - Ổn</option>
+                            <option value="2" th:selected="${existingReview != null && existingReview.rating == 2}">2 - Chưa hợp lý</option>
+                            <option value="1" th:selected="${existingReview != null && existingReview.rating == 1}">1 - Kém</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Bình luận</label>
+                        <textarea name="comment" class="form-control" rows="4" required
+                                  th:text="${existingReview != null ? existingReview.comment : ''}"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">
+                            Lưu đánh giá
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="review-card mb-4" th:if="${!isLogged}">
+                <div>Bạn cần <a href="/login">đăng nhập</a> để đánh giá khóa học.</div>
+            </div>
+            <div class="review-card mb-4" th:if="${isLogged && !isPurchased}">
+                <div>Bạn cần mua khóa học để đánh giá và bình luận.</div>
             </div>
 
             <!-- Khóa học liên quan -->

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Sửa bài học - Admin | OnlineCourse</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background: #f4f7fb;
+        }
+        .card {
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+        }
+        .card-header {
+            background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+            color: #fff;
+            border-radius: 16px 16px 0 0;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+            border-radius: 10px;
+        }
+        .btn-outline-secondary {
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/admin_navbar :: admin_navbar(activePage='courses')}"></div>
+
+<div class="container mt-4 pb-5">
+    <div class="mb-3">
+        <a th:href="@{'/admin/courses/' + ${course.id} + '/content'}" class="btn btn-outline-secondary">
+            Quay lại nội dung khóa học
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Chỉnh sửa bài học</div>
+        <div class="card-body">
+            <div class="mb-3">
+                <div class="fw-bold" th:text="${course.name}">Course</div>
+                <div class="text-muted" th:text="${chapter.title}">Chapter</div>
+            </div>
+
+            <form th:action="@{'/admin/courses/' + ${course.id} + '/chapters/' + ${chapter.id} + '/lessons/' + ${lesson.id} + '/update'}"
+                  method="post" enctype="multipart/form-data" class="row g-3">
+                <div class="col-12">
+                    <label class="form-label fw-bold">Tên bài học</label>
+                    <input type="text" name="title" class="form-control" th:value="${lesson.title}" required>
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-bold">File Word (upload)</label>
+                    <input type="file" name="lessonFile" class="form-control"
+                           accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                    <div class="text-muted mt-2" th:if="${lesson.videoUrl != null and !#strings.isEmpty(lesson.videoUrl)}">
+                        Hiện tại: <a th:href="${lesson.videoUrl}" target="_blank">Xem tài liệu</a>
+                    </div>
+                </div>
+                <div class="col-12 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    <a th:href="@{'/admin/courses/' + ${course.id} + '/content'}" class="btn btn-outline-secondary">Hủy</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
