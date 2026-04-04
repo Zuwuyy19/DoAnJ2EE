@@ -226,14 +226,14 @@
                     <div class="mt-auto">
 
                         <h5 class="text-danger mb-2"
-                            th:text="${course.price} + ' $'">
+                            th:text="${@currencyUtils.formatVnd(course.price)}">
                         </h5>
 
-                        <form th:if="${isLogged && !isAdmin}" th:action="@{'/cart/add/' + ${course.id}}" method="POST" class="mb-2">
-                            <button type="submit" class="btn btn-danger w-100 rounded-pill fw-bold">
-                                <i class="bi bi-cart-plus me-1"></i>Thêm vào giỏ hàng
-                            </button>
-                        </form>
+                        <button type="button" class="btn btn-danger w-100 rounded-pill fw-bold mb-2"
+                                th:if="${isLogged && !isAdmin}"
+                                th:attr="onclick=|addToCartAjax(${course.id}, this)|">
+                            <i class="bi bi-cart-plus me-1"></i>Thêm vào giỏ hàng
+                        </button>
 
                         <a th:href="@{'/courses/' + ${course.id}}"
                            class="btn btn-primary w-100">
@@ -292,7 +292,55 @@
     <p>© 2026 OnlineCourse - Website bán khóa học</p>
 </footer>
 
+<!-- Toast notification -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+    <div id="cartToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMessage">Thành công!</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    var cartToast;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        cartToast = new bootstrap.Toast(document.getElementById('cartToast'), { delay: 3000 });
+    });
+
+    function showToast(message, isSuccess) {
+        var toastEl = document.getElementById('cartToast');
+        var toastMsg = document.getElementById('toastMessage');
+        toastMsg.textContent = message;
+        toastEl.className = 'toast align-items-center border-0 ' + (isSuccess ? 'text-bg-success' : 'text-bg-danger');
+        cartToast = new bootstrap.Toast(toastEl, { delay: 3000 });
+        cartToast.show();
+    }
+
+    function addToCartAjax(courseId, btn) {
+        var originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Đang thêm...';
+
+        fetch('/cart/add/' + courseId, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            showToast(data.message, data.success);
+        })
+        .catch(function() {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            showToast('Có lỗi xảy ra!', false);
+        });
+    }
+</script>
 
 </body>
 </html>

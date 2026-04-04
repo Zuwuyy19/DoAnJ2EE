@@ -257,7 +257,7 @@
                         <img th:src="${rc.image}" onerror="this.src='https://via.placeholder.com/300x140/6366f1/ffffff?text=Course'">
                         <div class="card-body">
                             <div class="card-title" th:text="${rc.title}">Khóa học liên quan</div>
-                            <div class="card-price" th:text="${rc.price} + ' $'">$0</div>
+                            <div class="card-price" th:text="${@currencyUtils.formatVnd(rc.price)}">0 ₫</div>
                         </div>
                     </a>
                 </div>
@@ -278,24 +278,26 @@
                 <!-- USER -->
                 <div class="card border-0 shadow-lg rounded-3 overflow-hidden" th:if="${!isAdmin}">
                     <div class="card-body text-center p-4">
-                        <h1 class="text-danger fw-black mb-3 display-5 fw-bold" th:text="${course.price} + ' $'">$0</h1>
+                        <h1 class="text-danger fw-black mb-3 display-5 fw-bold" th:text="${@currencyUtils.formatVnd(course.price)}">0 ₫</h1>
 
                         <!-- Chưa mua -->
                         <div th:if="${!isPurchased}">
-                            <form th:action="@{'/cart/add/' + ${course.id}}" method="POST">
-                                <button type="submit" class="btn btn-danger btn-lg w-100 mb-3 fw-bold rounded-pill shadow-sm"
-                                        th:if="${isLogged}">
-                                    <i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ hàng
-                                </button>
-                            </form>
+                            <button type="button" class="btn btn-danger btn-lg w-100 mb-3 fw-bold rounded-pill shadow-sm"
+                                    th:if="${isLogged}"
+                                    th:attr="onclick=|addToCartAjax(${course.id}, this)|">
+                                <i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ hàng
+                            </button>
                             <a class="btn btn-danger btn-lg w-100 mb-3 fw-bold rounded-pill shadow-sm"
                                th:if="${!isLogged}" href="/login">
                                 <i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ hàng
                             </a>
-                            <form th:action="@{'/api/orders'}" method="POST" th:if="${isLogged}">
+
+                            <!-- Nút Mua ngay qua VNPay QR -->
+                            <form th:if="${isLogged}" th:action="@{/vnpay/create}" method="POST">
                                 <input type="hidden" name="courseId" th:value="${course.id}">
-                                <button type="submit" class="btn btn-outline-primary btn-lg w-100 rounded-pill fw-bold py-2">
-                                    <i class="bi bi-lightning-fill me-2"></i>Mua ngay
+                                <button type="submit"
+                                        class="btn btn-outline-primary btn-lg w-100 rounded-pill fw-bold py-2">
+                                    <i class="bi bi-qr-code-scan me-2"></i>Mua ngay (VNPay QR)
                                 </button>
                             </form>
                         </div>
@@ -330,7 +332,7 @@
                         <span class="badge bg-warning text-dark px-3 py-2 mb-3 rounded-pill">
                             <i class="bi bi-gear-fill me-1"></i>Chế độ quản trị
                         </span>
-                        <h1 class="text-secondary mb-3 display-5 fw-bold" th:text="${course.price} + ' $'">$0</h1>
+                        <h1 class="text-secondary mb-3 display-5 fw-bold" th:text="${@currencyUtils.formatVnd(course.price)}">0 ₫</h1>
                         <a th:href="@{'/admin/courses/edit/' + ${course.id}}"
                            class="btn btn-warning btn-lg w-100 mb-3 fw-bold rounded-pill text-white">
                             <i class="bi bi-pencil-square me-2"></i>Chỉnh sửa khóa học
@@ -363,5 +365,48 @@
         alert('Trình xem bài học #' + id + ' đang được phát triển!');
     }
 </script>
+
+<!-- Toast notification -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+    <div id="cartToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMessage">Thành công!</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    var cartToast;
+    document.addEventListener('DOMContentLoaded', function() {
+        cartToast = new bootstrap.Toast(document.getElementById('cartToast'), { delay: 3000 });
+    });
+    function showToast(message, isSuccess) {
+        var toastEl = document.getElementById('cartToast');
+        var toastMsg = document.getElementById('toastMessage');
+        toastMsg.textContent = message;
+        toastEl.className = 'toast align-items-center border-0 ' + (isSuccess ? 'text-bg-success' : 'text-bg-danger');
+        cartToast = new bootstrap.Toast(toastEl, { delay: 3000 });
+        cartToast.show();
+    }
+    function addToCartAjax(courseId, btn) {
+        var originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Đang thêm...';
+        fetch('/cart/add/' + courseId, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            showToast(data.message, data.success);
+        })
+        .catch(function() {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            showToast('Có lỗi xảy ra!', false);
+        });
+    }
+</script>
+
 </body>
 </html>

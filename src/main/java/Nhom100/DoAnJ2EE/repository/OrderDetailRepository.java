@@ -11,8 +11,15 @@ import java.util.List;
 @Repository
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
     List<OrderDetail> findByOrderUserId(Long userId);
-    boolean existsByOrderUserIdAndCourseId(Long userId, Long courseId);
+
+    @Query("SELECT COUNT(od) > 0 FROM OrderDetail od " +
+           "WHERE od.order.user.id = :userId " +
+           "AND od.course.id = :courseId " +
+           "AND od.order.status IN ('PAID', 'COMPLETED')")
+    boolean existsByOrderUserIdAndCourseId(Long userId, @Param("courseId") Long courseId);
 
     @Query("SELECT COUNT(DISTINCT od.order.user.id) FROM OrderDetail od WHERE od.course.id = :courseId")
     long countDistinctStudentsByCourseId(@Param("courseId") Long courseId);
+
+    void deleteByOrderId(Long orderId);
 }

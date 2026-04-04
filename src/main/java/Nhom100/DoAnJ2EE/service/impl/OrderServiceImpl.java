@@ -1,5 +1,6 @@
 package Nhom100.DoAnJ2EE.service.impl;
 
+import Nhom100.DoAnJ2EE.config.VNPayConfig;
 import Nhom100.DoAnJ2EE.dto.CreateOrderRequest;
 import Nhom100.DoAnJ2EE.dto.OrderResponse;
 import Nhom100.DoAnJ2EE.entity.Course;
@@ -16,7 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +37,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private VNPayConfig vnPayConfig;
 
     @Override
     @Transactional
@@ -83,6 +90,79 @@ public class OrderServiceImpl implements OrderService {
                     return response;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> createVNPayOrder(Long userId, Long courseId, String ipAddress) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy người dùng"));
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy khóa học"));
+
+        if (orderDetailRepository.existsByOrderUserIdAndCourseId(userId, courseId)) {
+            throw new IllegalStateException("Bạn đã mua khóa học này rồi!");
+        }
+
+        // Sinh mã thanh toán VNPay (format: ODC + uuid ngắn)
+        String paymentCode = "ODC" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+
+        // Tạo đơn hàng PENDING
+        Order order = new Order();
+        order.setUser(user);
+        order.setTotalAmount(course.getPrice());
+        order.setStatus("PENDING");
+        order.setPaymentType("VNPAY");
+        order.setPaymentCode(paymentCode);
+        Order savedOrder = orderRepository.save(order);
+
+        // Lưu OrderDetail
+        OrderDetail orderDetail = new OrderDetail(savedOrder, course, course.getPrice());
+        orderDetailRepository.save(orderDetail);
+
+        // Tạo URL thanh toán VNPay — quy đổi USD → VND
+        long amountVnd = vnPayConfig.convertToVnd(course.getPrice());
+        String paymentUrl = vnPayConfig.createPaymentUrl(amountVnd, paymentCode, paymentCode, ipAddress);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("orderId", savedOrder.getId());
+        result.put("paymentCode", paymentCode);
+        result.put("paymentUrl", paymentUrl);
+        result.put("amount", course.getPrice());
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public Order handleVNPayReturn(Map<String, String> params) {
+        // Xác minh checksum
+        if (!vnPayConfig.verifyReturn(new HashMap<>(params))) {
+            throw new IllegalStateException("Xác minh chữ ký VNPay thất bại!");
+        }
+
+        String responseCode = params.get("vnp_responsecode"); // "00" = thành công
+        String paymentCode  = params.get("vnp_orderinfo");   // Mã thanh toán
+        String txnRef       = params.get("vnp_txnref");       // Mã giao dịch
+
+        Order order = orderRepository.findByPaymentCode(paymentCode)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng với mã: " + paymentCode));
+
+        if ("00".equals(responseCode)) {
+            order.setStatus("PAID");
+            order.setTransactionId(txnRef);
+            return orderRepository.save(order);
+        } else {
+            order.setStatus("CANCELLED");
+            // Xóa OrderDetail đã tạo trước khi thanh toán (thanh toán thất bại)
+            orderDetailRepository.deleteByOrderId(order.getId());
+            return orderRepository.save(order);
+        }
+    }
+
+    @Override
+    public Order getOrderById(Long orderId) {
+        return orderRepository.findById(orderId).orElse(null);
     }
 }
 

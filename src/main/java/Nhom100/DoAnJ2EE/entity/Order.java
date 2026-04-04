@@ -34,6 +34,15 @@ public class Order {
     @Column(name = "status")
     private String status = "PENDING";
 
+    @Column(name = "payment_type")
+    private String paymentType; // "VNPAY", "DIRECT"
+
+    @Column(name = "payment_code", unique = true)
+    private String paymentCode; // Mã thanh toán VNPay
+
+    @Column(name = "transaction_id")
+    private String transactionId; // Mã giao dịch VNPay
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

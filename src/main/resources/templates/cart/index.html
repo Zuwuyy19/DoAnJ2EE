@@ -4,6 +4,7 @@
     <title>Giỏ hàng</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body class="bg-light">
 
@@ -56,7 +57,7 @@
                                 </div>
                             </td>
                             <td>
-                                <span class="text-danger fw-bold" th:text="${item.course.price} + ' $'"></span>
+                                <span class="text-danger fw-bold" th:text="${@currencyUtils.formatVnd(item.course.price)}"></span>
                             </td>
                             <td>
                                 <form th:action="@{'/cart/remove/' + ${item.id}}" method="post">
@@ -79,12 +80,20 @@
                 <h5 class="fw-bold mb-4">Tổng cộng</h5>
                 <div class="d-flex justify-content-between mb-4">
                     <span class="text-muted">Tổng tiền:</span>
-                    <h3 class="text-danger fw-bold mb-0" th:text="${cart != null ? cart.totalAmount : 0.0} + ' $'"></h3>
+                    <h3 class="text-danger fw-bold mb-0" th:text="${@currencyUtils.formatVnd(cart != null ? cart.totalAmount : 0.0)}">0 ₫</h3>
                 </div>
                 
+                <form th:action="@{/cart/checkout-vnpay}" method="post">
+                    <button type="submit" class="btn btn-danger btn-lg w-100 rounded-pill shadow-sm fw-bold mb-2"
+                            th:disabled="${cart == null || #lists.isEmpty(cart.items)}">
+                        <i class="bi bi-qr-code-scan me-1"></i>
+                        Thanh toán qua VNPay QR
+                    </button>
+                </form>
                 <form th:action="@{/cart/checkout}" method="post">
-                    <button type="submit" class="btn btn-danger btn-lg w-100 rounded-pill shadow-sm fw-bold" th:disabled="${cart == null || #lists.isEmpty(cart.items)}">
-                        Thanh toán (Fake)
+                    <button type="submit" class="btn btn-outline-primary btn-lg w-100 rounded-pill fw-bold"
+                            th:disabled="${cart == null || #lists.isEmpty(cart.items)}">
+                        Thanh toán nhanh (Demo)
                     </button>
                 </form>
             </div>

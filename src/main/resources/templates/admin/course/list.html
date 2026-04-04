@@ -52,7 +52,7 @@
                             <div class="small text-muted" th:text="${course.title}"></div>
                         </td>
                         <td th:text="${course.category != null ? course.category.name : 'Chưa phân loại'}"></td>
-                        <td class="fw-bold text-danger" th:text="${course.price} + ' $'"></td>
+                        <td class="fw-bold text-danger" th:text="${@currencyUtils.formatVnd(course.price)}"></td>
                         <td class="text-end pe-3">
                             <a th:href="@{'/courses/' + ${course.id}}" class="btn btn-sm btn-outline-secondary rounded-pill" target="_blank" title="Xem trước">
                                 <i class="bi bi-eye"></i>
