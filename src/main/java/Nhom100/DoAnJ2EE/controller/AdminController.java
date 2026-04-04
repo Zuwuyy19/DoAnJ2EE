@@ -13,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 
 import Nhom100.DoAnJ2EE.entity.Course;
@@ -29,6 +31,7 @@ import Nhom100.DoAnJ2EE.repository.ChapterRepository;
 import Nhom100.DoAnJ2EE.repository.LessonRepository;
 import Nhom100.DoAnJ2EE.repository.OrderDetailRepository;
 import Nhom100.DoAnJ2EE.repository.RoleRepository;
+import Nhom100.DoAnJ2EE.repository.OrderRepository;
 import Nhom100.DoAnJ2EE.dto.PurchasedCourseSummary;
 
 @Controller
@@ -58,16 +61,56 @@ public class AdminController {
     private OrderDetailRepository orderDetailRepository;
 
     @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
     private RoleRepository roleRepository;
 
     @Value("${app.upload.dir:uploads}")
     private String uploadDir;
 
     @GetMapping
-    public String adminDashboard(Model model) {
+    public String adminDashboard(Model model,
+            @RequestParam(value = "period", required = false, defaultValue = "month") String period,
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate", required = false) String endDate,
+            @RequestParam(value = "year", required = false) Integer year,
+            @RequestParam(value = "month", required = false) Integer month,
+            @RequestParam(value = "day", required = false) Integer day,
+            @RequestParam(value = "singleDate", required = false) String singleDate,
+            @RequestParam(value = "monthValue", required = false) String monthValue,
+            @RequestParam(value = "yearValue", required = false) Integer yearValue) {
         model.addAttribute("courseCount", courseService.getAllCourses().size());
         model.addAttribute("categoryCount", categoryRepository.count());
         model.addAttribute("userCount", userRepository.count());
+        if (singleDate != null && !singleDate.isBlank()) {
+            LocalDate d = LocalDate.parse(singleDate);
+            year = d.getYear();
+            month = d.getMonthValue();
+            day = d.getDayOfMonth();
+        }
+        if (monthValue != null && !monthValue.isBlank()) {
+            java.time.YearMonth ym = java.time.YearMonth.parse(monthValue);
+            year = ym.getYear();
+            month = ym.getMonthValue();
+        }
+        if (yearValue != null) {
+            year = yearValue;
+        }
+        RevenueData revenueData = buildRevenue(period, startDate, endDate, year, month, day);
+        model.addAttribute("revenueLabels", revenueData.labels);
+        model.addAttribute("revenueValues", revenueData.values);
+        model.addAttribute("period", period);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        model.addAttribute("year", year);
+        model.addAttribute("month", month);
+        model.addAttribute("day", day);
+        model.addAttribute("singleDate", singleDate);
+        model.addAttribute("monthValue", monthValue);
+        model.addAttribute("yearValue", yearValue);
+        model.addAttribute("topCourses", limitTopCourses(orderDetailRepository.findTopCourses(), 5));
+        model.addAttribute("topUsers", limitTopUsers(orderRepository.findTopUsers(), 5));
         return "admin/admin";
     }
 
@@ -479,5 +522,120 @@ public class AdminController {
     public String deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return "redirect:/admin/users";
+    }
+
+    @PostMapping("/users/{id}/toggle")
+    public String toggleUser(@PathVariable Long id) {
+        User user = userService.getUserById(id).orElse(null);
+        if (user != null) {
+            user.setEnabled(!user.isEnabled());
+            userService.saveUser(user);
+        }
+        return "redirect:/admin/users";
+    }
+
+    private List<OrderDetailRepository.TopCourseSummary> limitTopCourses(
+            List<OrderDetailRepository.TopCourseSummary> list, int max) {
+        if (list == null) return List.of();
+        return list.size() <= max ? list : list.subList(0, max);
+    }
+
+    private List<OrderRepository.TopUserSummary> limitTopUsers(
+            List<OrderRepository.TopUserSummary> list, int max) {
+        if (list == null) return List.of();
+        return list.size() <= max ? list : list.subList(0, max);
+    }
+
+    private static class RevenueData {
+        List<String> labels;
+        List<Double> values;
+        RevenueData(List<String> labels, List<Double> values) {
+            this.labels = labels;
+            this.values = values;
+        }
+    }
+
+    private RevenueData buildRevenue(String period, String startDate, String endDate,
+            Integer year, Integer month, Integer day) {
+        LocalDateTime start = parseStart(startDate);
+        LocalDateTime end = parseEnd(endDate);
+        List<String> labels = new ArrayList<>();
+        List<Double> values = new ArrayList<>();
+        if ("day".equalsIgnoreCase(period)) {
+            List<OrderRepository.DailyRevenueSummary> rows;
+            if (day != null && month != null && year != null) {
+                LocalDateTime dStart = LocalDate.of(year, month, day).atStartOfDay();
+                LocalDateTime dEnd = LocalDate.of(year, month, day).atTime(LocalTime.MAX);
+                rows = orderRepository.findDailyRevenueBetween(dStart, dEnd);
+            } else {
+                rows = (start != null && end != null)
+                        ? orderRepository.findDailyRevenueBetween(start, end)
+                        : orderRepository.findDailyRevenue();
+            }
+            for (OrderRepository.DailyRevenueSummary d : rows) {
+                labels.add(d.getDay());
+                values.add(d.getRevenue() != null ? d.getRevenue() : 0.0);
+            }
+            return new RevenueData(labels, values);
+        }
+        if ("week".equalsIgnoreCase(period)) {
+            List<OrderRepository.WeeklyRevenueSummary> rows = (start != null && end != null)
+                    ? orderRepository.findWeeklyRevenueBetween(start, end)
+                    : orderRepository.findWeeklyRevenue();
+            for (OrderRepository.WeeklyRevenueSummary w : rows) {
+                labels.add("Tuần " + w.getWeek() + "/" + w.getYear());
+                values.add(w.getRevenue() != null ? w.getRevenue() : 0.0);
+            }
+            return new RevenueData(labels, values);
+        }
+        if ("month".equalsIgnoreCase(period) && year != null && month != null) {
+            LocalDateTime mStart = LocalDate.of(year, month, 1).atStartOfDay();
+            LocalDateTime mEnd = LocalDate.of(year, month, 1).withDayOfMonth(LocalDate.of(year, month, 1).lengthOfMonth()).atTime(LocalTime.MAX);
+            List<OrderRepository.MonthlyRevenueSummary> rows = orderRepository.findMonthlyRevenueBetween(mStart, mEnd);
+            for (OrderRepository.MonthlyRevenueSummary m : rows) {
+                if (m.getMonth() == null || m.getYear() == null) continue;
+                String label = String.format("%02d/%d", m.getMonth(), m.getYear());
+                labels.add(label);
+                values.add(m.getRevenue() != null ? m.getRevenue() : 0.0);
+            }
+            return new RevenueData(labels, values);
+        }
+        if ("year".equalsIgnoreCase(period)) {
+            List<OrderRepository.YearlyRevenueSummary> rows;
+            if (year != null) {
+                LocalDateTime yStart = LocalDate.of(year, 1, 1).atStartOfDay();
+                LocalDateTime yEnd = LocalDate.of(year, 12, 31).atTime(LocalTime.MAX);
+                rows = orderRepository.findYearlyRevenueBetween(yStart, yEnd);
+            } else {
+                rows = (start != null && end != null)
+                        ? orderRepository.findYearlyRevenueBetween(start, end)
+                        : orderRepository.findYearlyRevenue();
+            }
+            for (OrderRepository.YearlyRevenueSummary y : rows) {
+                labels.add(String.valueOf(y.getYear()));
+                values.add(y.getRevenue() != null ? y.getRevenue() : 0.0);
+            }
+            return new RevenueData(labels, values);
+        }
+        List<OrderRepository.MonthlyRevenueSummary> rows = (start != null && end != null)
+                ? orderRepository.findMonthlyRevenueBetween(start, end)
+                : orderRepository.findMonthlyRevenue();
+        for (OrderRepository.MonthlyRevenueSummary m : rows) {
+            if (m.getMonth() == null || m.getYear() == null) continue;
+            String label = String.format("%02d/%d", m.getMonth(), m.getYear());
+            labels.add(label);
+            values.add(m.getRevenue() != null ? m.getRevenue() : 0.0);
+        }
+        return new RevenueData(labels, values);
+    }
+
+    private LocalDateTime parseStart(String startDate) {
+        if (startDate == null || startDate.isBlank()) return null;
+        return LocalDate.parse(startDate).atStartOfDay();
+    }
+
+    private LocalDateTime parseEnd(String endDate) {
+        if (endDate == null || endDate.isBlank()) return null;
+        return LocalDate.parse(endDate).atTime(LocalTime.MAX);
     }
 }

@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import org.springframework.data.jpa.repository.Query;
 
 @Repository
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
@@ -26,7 +25,18 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
         Long getTotalOrders();
     }
 
+    interface TopCourseSummary {
+        Long getCourseId();
+        String getTitle();
+        Long getTotalOrders();
+        Double getRevenue();
+    }
+
     @Query("SELECT od.course.id as courseId, COUNT(od.id) as totalOrders " +
            "FROM OrderDetail od GROUP BY od.course.id ORDER BY COUNT(od.id) DESC")
     List<CourseTrendingSummary> findTrendingCourses();
+
+    @Query("SELECT od.course.id as courseId, od.course.title as title, COUNT(od.id) as totalOrders, SUM(od.price) as revenue " +
+           "FROM OrderDetail od GROUP BY od.course.id, od.course.title ORDER BY SUM(od.price) DESC")
+    List<TopCourseSummary> findTopCourses();
 }
