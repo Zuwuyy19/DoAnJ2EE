@@ -11,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.Map;
+import java.util.HashMap;
 
 @Controller
 @RequestMapping("/cart")
@@ -37,16 +39,19 @@ public class CartWebController {
         boolean isLogged = user != null;
         String userDisplayName = null;
         String userHandle = null;
+        int cartItemCount = 0;
         if (isLogged) {
             isAdmin = auth.getAuthorities().stream()
                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
             userDisplayName = auth.getName();
             userHandle = "@" + auth.getName();
+            cartItemCount = cartService.getCartItemCount(user);
         }
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("isLogged", isLogged);
         model.addAttribute("userDisplayName", userDisplayName);
         model.addAttribute("userHandle", userHandle);
+        model.addAttribute("cartItemCount", cartItemCount);
     }
 
     @GetMapping
@@ -77,6 +82,28 @@ public class CartWebController {
         }
         
         return "redirect:/courses/" + courseId;
+    }
+
+    @PostMapping("/add/{courseId}/ajax")
+    @ResponseBody
+    public Map<String, Object> addToCartAjax(@PathVariable Long courseId) {
+        Map<String, Object> result = new HashMap<>();
+        User user = getAuthenticatedUser();
+        if (user == null) {
+            result.put("success", false);
+            result.put("message", "Bạn cần đăng nhập");
+            return result;
+        }
+        try {
+            cartService.addToCart(user, courseId);
+            int count = cartService.getCartItemCount(user);
+            result.put("success", true);
+            result.put("count", count);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", e.getMessage());
+        }
+        return result;
     }
 
     @PostMapping("/remove/{itemId}")

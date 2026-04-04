@@ -43,9 +43,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="cat : ${categories}">
+                            <tr th:each="cat, stat : ${categories}">
                                 <td class="ps-4">
-                                    <span class="badge bg-light text-secondary border fw-medium" th:text="'#' + ${cat.id}">#0</span>
+                                    <span class="badge bg-light text-secondary border fw-medium" th:text="'#' + ${stat.count}">#1</span>
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
@@ -62,10 +62,11 @@
                                     <a th:href="@{'/admin/categories/edit/' + ${cat.id}}" class="btn btn-sm btn-outline-primary btn-pill px-3 me-2">
                                         <i class="bi bi-pencil-square me-1"></i>Sửa
                                     </a>
-                                    <a th:href="@{'/admin/categories/delete/' + ${cat.id}}" class="btn btn-sm btn-outline-danger btn-pill px-3" 
+                                    <a th:if="${cat.name != 'Lập trình Java' and cat.name != 'Web Front-End' and cat.name != 'An ninh mạng' and cat.name != 'Kỹ năng mềm'}" th:href="@{'/admin/categories/delete/' + ${cat.id}}" class="btn btn-sm btn-outline-danger btn-pill px-3" 
                                        onclick="return confirm('Bạn có chắc chắn muốn xóa? Thao tác này có thể ảnh hưởng đến các khóa học thuộc danh mục này.')">
                                         <i class="bi bi-trash me-1"></i>Xóa
                                     </a>
+                                    <span th:if="${cat.name == 'Lập trình Java' or cat.name == 'Web Front-End' or cat.name == 'An ninh mạng' or cat.name == 'Kỹ năng mềm'}" class="badge bg-light text-secondary border rounded-pill px-3">Cố định</span>
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(categories)}">

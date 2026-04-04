@@ -5,6 +5,38 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .owned-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #10b981;
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .cart-toast {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            background: #111827;
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .cart-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
 </head>
 <body class="bg-light">
 
@@ -67,6 +99,11 @@
                         <img th:src="${course.image}" class="card-img-top" alt="Course Image" style="height: 180px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/400x180/6366f1/ffffff?text=No+Image'">
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title fw-bold" th:text="${course.title}"></h5>
+                            <div class="mb-2" th:if="${purchasedCourseIds.contains(course.id)}">
+                                <span class="owned-pill">
+                                    <i class="bi bi-check-circle-fill"></i>Đã sở hữu
+                                </span>
+                            </div>
                             <p class="card-text text-muted small" th:text="${course.category != null ? course.category.name : 'Khác'}"></p>
                             <div class="text-muted small mb-2" th:if="${courseAvgRatings[course.id] != null}">
                                 <i class="bi bi-star-fill text-warning me-1"></i>
@@ -77,7 +114,7 @@
                             </div>
                             <div class="mt-auto">
                                 <h5 class="text-danger fw-bold mb-2" th:text="${course.price} + ' $'"></h5>
-                                <form th:if="${isLogged && !isAdmin}" th:action="@{'/cart/add/' + ${course.id}}" method="POST" class="mb-2">
+                                <form th:if="${isLogged && !isAdmin}" th:action="@{'/cart/add/' + ${course.id}}" method="POST" class="mb-2 add-to-cart-form" th:attr="data-course-id=${course.id}">
                                     <button type="submit" class="btn btn-danger w-100 rounded-pill fw-bold">
                                         <i class="bi bi-cart-plus me-1"></i>Thêm vào giỏ hàng
                                     </button>
@@ -94,6 +131,48 @@
         </div>
     </div>
 </div>
+
+<div id="cart-toast" class="cart-toast">Đã thêm vào giỏ hàng</div>
+
+<script>
+    const toastEl = document.getElementById('cart-toast');
+    function showToast(message) {
+        if (!toastEl) return;
+        toastEl.textContent = message;
+        toastEl.classList.add('show');
+        setTimeout(() => toastEl.classList.remove('show'), 1500);
+    }
+
+    function updateCartBadge(count) {
+        const badge = document.querySelector('.cart-badge');
+        if (!badge) return;
+        if (count && count > 0) {
+            badge.textContent = count;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    document.querySelectorAll('.add-to-cart-form').forEach(form => {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const response = await fetch(form.action + '/ajax', { method: 'POST' });
+                if (!response.ok) throw new Error();
+                const data = await response.json();
+                if (data.success) {
+                    showToast('Đã thêm vào giỏ hàng');
+                    updateCartBadge(data.count);
+                } else {
+                    showToast(data.message || 'Không thể thêm vào giỏ hàng');
+                }
+            } catch (err) {
+                showToast('Không thể thêm vào giỏ hàng');
+            }
+        });
+    });
+</script>
 
 </body>
 </html>

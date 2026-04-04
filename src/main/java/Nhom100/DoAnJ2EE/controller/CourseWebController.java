@@ -8,6 +8,8 @@ import Nhom100.DoAnJ2EE.repository.CourseReviewRepository;
 import Nhom100.DoAnJ2EE.repository.CategoryRepository;
 import Nhom100.DoAnJ2EE.repository.OrderDetailRepository;
 import Nhom100.DoAnJ2EE.repository.UserRepository;
+import Nhom100.DoAnJ2EE.service.CartService;
+import Nhom100.DoAnJ2EE.entity.OrderDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Set;
+import java.util.HashSet;
+import java.time.LocalDateTime;
 
 @Controller
 public class CourseWebController {
@@ -41,6 +46,9 @@ public class CourseWebController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CartService cartService;
+
     private Long getAuthenticatedUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated()
@@ -58,6 +66,7 @@ public class CourseWebController {
         boolean isLogged = false;
         String userDisplayName = null;
         String userHandle = null;
+        int cartItemCount = 0;
         if (auth != null && auth.isAuthenticated()
                 && !"anonymousUser".equals(auth.getPrincipal().toString())) {
             isLogged = true;
@@ -65,11 +74,16 @@ public class CourseWebController {
                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
             userDisplayName = auth.getName();
             userHandle = "@" + auth.getName();
+            User user = userRepository.findByEmail(auth.getName()).orElse(null);
+            if (user != null) {
+                cartItemCount = cartService.getCartItemCount(user);
+            }
         }
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("isLogged", isLogged);
         model.addAttribute("userDisplayName", userDisplayName);
         model.addAttribute("userHandle", userHandle);
+        model.addAttribute("cartItemCount", cartItemCount);
     }
 
     private boolean hasPurchased(Long userId, Long courseId) {
@@ -83,6 +97,21 @@ public class CourseWebController {
             @RequestParam(required = false) Integer minRating,
             @RequestParam(required = false) String q) {
         addAuthAttributes(model);
+        Long userId = getAuthenticatedUserId();
+        Set<Long> purchasedCourseIds = new HashSet<>();
+        Map<Long, LocalDateTime> purchasedCourseDates = new HashMap<>();
+        if (userId != null) {
+            List<OrderDetail> orderDetails = orderDetailRepository.findByOrderUserId(userId);
+            for (OrderDetail od : orderDetails) {
+                if (od.getCourse() != null) {
+                    Long courseId = od.getCourse().getId();
+                    purchasedCourseIds.add(courseId);
+                    if (od.getOrder() != null) {
+                        purchasedCourseDates.put(courseId, od.getOrder().getOrderDate());
+                    }
+                }
+            }
+        }
         List<Course> courses = categoryId != null
                 ? courseRepository.findByCategoryId(categoryId)
                 : courseRepository.findAll();
@@ -122,6 +151,8 @@ public class CourseWebController {
         model.addAttribute("categoryId", categoryId);
         model.addAttribute("minRating", minRating);
         model.addAttribute("q", q);
+        model.addAttribute("purchasedCourseIds", purchasedCourseIds);
+        model.addAttribute("purchasedCourseDates", purchasedCourseDates);
         return "course/list";
     }
 

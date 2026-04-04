@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.text.Normalizer;
 import java.util.*;
 
 import Nhom100.DoAnJ2EE.entity.Course;
@@ -455,6 +456,7 @@ public class AdminController {
 
     @GetMapping("/categories")
     public String listCategories(Model model) {
+        ensureDefaultCategories();
         model.addAttribute("categories", categoryRepository.findAll());
         return "admin/category/list";
     }
@@ -482,6 +484,11 @@ public class AdminController {
 
     @GetMapping("/categories/delete/{id}")
     public String deleteCategory(@PathVariable Long id) {
+        Category category = categoryRepository.findById(id).orElse(null);
+        if (category == null) return "redirect:/admin/categories";
+        if (isDefaultCategory(category.getName())) {
+            return "redirect:/admin/categories";
+        }
         // Lưu ý: Nếu danh mục có khóa học, hibernate sẽ báo lỗi hoặc xóa cascade tùy
         // config
         categoryRepository.deleteById(id);
@@ -544,6 +551,28 @@ public class AdminController {
             List<OrderRepository.TopUserSummary> list, int max) {
         if (list == null) return List.of();
         return list.size() <= max ? list : list.subList(0, max);
+    }
+
+    private void ensureDefaultCategories() {
+        String[] defaults = new String[] { "Lập trình Java", "Web Front-End", "Kỹ năng mềm", "An ninh mạng" };
+        for (String name : defaults) {
+            if (!categoryRepository.existsByName(name)) {
+                Category category = new Category();
+                category.setName(name);
+                categoryRepository.save(category);
+            }
+        }
+    }
+
+    private boolean isDefaultCategory(String name) {
+        if (name == null) return false;
+        String normalized = Normalizer.normalize(name, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toLowerCase();
+        return normalized.equals("lap trinh java")
+                || normalized.equals("web front-end")
+                || normalized.equals("an ninh mang")
+                || normalized.equals("ky nang mem");
     }
 
     private static class RevenueData {

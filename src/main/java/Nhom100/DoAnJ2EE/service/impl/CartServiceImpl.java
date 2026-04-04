@@ -130,4 +130,10 @@ public class CartServiceImpl implements CartService {
 
         return responses;
     }
+
+    @Override
+    public int getCartItemCount(User user) {
+        Cart cart = getCartByUser(user);
+        return cart.getItems() != null ? cart.getItems().size() : 0;
+    }
 }

@@ -10,4 +10,5 @@ public interface CartService {
     Cart addToCart(User user, Long courseId);
     Cart removeFromCart(User user, Long cartItemId);
     List<OrderResponse> checkout(User user);
+    int getCartItemCount(User user);
 }

@@ -80,6 +80,21 @@
             .logout-btn:hover {
                 background-color: #fef2f2 !important;
             }
+            .cart-badge {
+                position: absolute;
+                top: 0;
+                right: 2px;
+                transform: translate(50%, -40%);
+                background: #ef4444;
+                color: #fff;
+                border-radius: 999px;
+                padding: 2px 6px;
+                font-size: 0.7rem;
+                font-weight: 700;
+                line-height: 1;
+                min-width: 18px;
+                text-align: center;
+            }
         </style>
 
         <div class="container">
@@ -97,8 +112,11 @@
                     <li class="nav-item">
                         <a class="nav-link px-3 fw-semibold" th:classappend="${activePage == 'courses' ? 'active text-primary' : ''}" href="/courses">Khóa học</a>
                     </li>
-                    <li class="nav-item" th:if="${isLogged}">
-                        <a class="nav-link px-3 fw-semibold" th:classappend="${activePage == 'cart' ? 'active text-primary' : ''}" href="/cart">Giỏ hàng</a>
+                    <li class="nav-item position-relative" th:if="${isLogged}">
+                        <a class="nav-link px-3 fw-semibold" th:classappend="${activePage == 'cart' ? 'active text-primary' : ''}" href="/cart">
+                            Giỏ hàng
+                            <span class="cart-badge" th:text="${cartItemCount}" th:style="${cartItemCount > 0} ? '' : 'display:none'">0</span>
+                        </a>
                     </li>
                     <li class="nav-item" th:if="${isLogged}">
                         <a class="nav-link px-3 fw-semibold" th:classappend="${activePage == 'history' ? 'active text-primary' : ''}" href="/orders/history">Lịch sử</a>
