@@ -51,7 +51,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // Tạo sẵn một tài khoản Admin để test
-        if (userRepository.findByEmail("admin@gmail.com") == null) {
+        if (userRepository.findByEmail("admin@gmail.com").orElse(null) == null) {
             User admin = new User();
             admin.setEmail("admin@gmail.com");
             admin.setPassword(passwordEncoder.encode("123456"));
@@ -62,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
 
         // Khởi tạo Danh mục mẫu nếu chưa có
         if (categoryRepository.count() == 0) {
-            String[] defaultCategories = {"Lập trình Java", "Web Front-End", "Digital Marketing", "Kỹ năng mềm"};
+            String[] defaultCategories = { "Lập trình Java", "Web Front-End", "Digital Marketing", "Kỹ năng mềm" };
             for (String name : defaultCategories) {
                 Category cat = new Category();
                 cat.setName(name);
@@ -91,7 +91,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String login(LoginRequest request) {
 
-        User user = userRepository.findByEmail(request.getEmail());
+        User user = userRepository.findByEmail(request.getEmail()).orElse(null);
 
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             return "Login failed!";
@@ -99,16 +99,17 @@ public class AuthServiceImpl implements AuthService {
 
         return JwtUtil.generateToken(user.getEmail());
     }
+
     @Override
     public boolean loginWeb(LoginRequest request) {
 
-        User user = userRepository.findByEmail(request.getEmail());
+        User user = userRepository.findByEmail(request.getEmail()).orElse(null);
 
-        if (user == null) return false;
+        if (user == null)
+            return false;
 
         return passwordEncoder.matches(
-            request.getPassword(),
-            user.getPassword()
-        );
-    }    
+                request.getPassword(),
+                user.getPassword());
+    }
 }

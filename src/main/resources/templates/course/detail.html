@@ -111,37 +111,27 @@
             background: #f59e0b; color: white; font-weight: 700;
             padding: 3px 12px; border-radius: 20px; font-size: 0.75rem;
         }
+        /* â”€â”€ REVIEWS â”€â”€ */
+        .review-card {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid #e8eaf0;
+            padding: 16px 18px;
+        }
+        .review-meta { color: #6b7280; font-size: 0.85rem; }
+        .rating-badge {
+            background: #eef2ff;
+            color: #4f46e5;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+        }
     </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
-    <div class="container">
-        <a class="navbar-brand" href="/">🎓 OnlineCourse</a>
-        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navMenu">
-            <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
-                <li class="nav-item"><a class="nav-link" href="/">Trang chủ</a></li>
-                <li class="nav-item"><a class="nav-link active fw-bold text-primary" href="/courses">Khóa học</a></li>
-                <li class="nav-item" th:if="${isLogged}"><a class="nav-link" href="/cart">Giỏ hàng</a></li>
-                <li class="nav-item" th:if="${isLogged}"><a class="nav-link" href="/orders/history">Lịch sử</a></li>
-                <li class="nav-item" th:if="${isAdmin}"><span class="admin-badge ms-2">⚡ ADMIN</span></li>
-                <li class="nav-item" th:if="${isLogged}">
-                    <a class="nav-link text-danger fw-semibold" href="/logout">Đăng xuất</a>
-                </li>
-                <li class="nav-item" th:if="${!isLogged}">
-                    <a class="btn btn-primary ms-lg-2 rounded-pill px-3" href="/login">Đăng nhập</a>
-                </li>
-                <li class="nav-item" th:if="${!isLogged}">
-                    <a class="btn btn-outline-primary ms-lg-1 rounded-pill px-3" href="/register">Đăng ký</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<div th:replace="~{fragments/navbar :: navbar(activePage='courses')}"></div>
 
 <!-- HERO -->
 <section class="course-hero">
@@ -207,6 +197,11 @@
             <h2 class="section-title">Giới thiệu khóa học</h2>
             <div class="course-desc mb-4">
                 <p th:text="${course.description}">Mô tả chi tiết</p>
+                <div class="mt-3" th:if="${course.purchasedDetail != null and !#strings.isEmpty(course.purchasedDetail)}"
+                     th:text="${course.purchasedDetail}">Chi tiết khóa học</div>
+                <div class="mt-3" th:if="${course.videoUrl != null and !#strings.isEmpty(course.videoUrl)}">
+                    Video: <a th:href="${course.videoUrl}" target="_blank">Xem video</a>
+                </div>
             </div>
 
             <!-- Nội dung chương -->
@@ -214,37 +209,81 @@
 
             <div th:if="${#lists.isEmpty(course.chapters)}" class="alert alert-light border text-center py-4 rounded-3">
                 <i class="bi bi-inbox fs-1 text-muted d-block mb-2"></i>
-                <span class="text-muted">Khóa học đang được cập nhật nội dung...</span>
+                <span class="text-muted">Khóa học đang cập nhật nội dung....</span>
             </div>
 
             <div class="chapter-card" th:each="chapter, chStat : ${course.chapters}" th:classappend="${chStat.index == 0} ? 'open'">
-                <div class="chapter-header" th:onclick="toggleChapter(this)">
+                <div class="chapter-header" th:onclick="(isPurchased || isAdmin) ? toggleChapter(this) : null">
                     <div>
                         <div class="ch-title">
                             <i class="bi bi-folder2-open me-2 text-warning"></i>
                             Chương [[${chStat.count}]]: [[${chapter.title}]]
                         </div>
-                        <div class="ch-meta mt-1">
-                            <span th:text="${chapter.lessons?.size() ?: 0}">0</span> bài giảng
+                        <div class="ch-meta mt-1" th:if="${isPurchased || isAdmin}">
+                            <span th:text="${chapter.lessons?.size() ?: 0}">0</span> Bài giảng
                         </div>
                     </div>
-                    <i class="bi bi-chevron-down ch-toggle"></i>
+                    <i class="bi bi-chevron-down ch-toggle" th:if="${isPurchased || isAdmin}"></i>
                 </div>
-                <div class="lesson-wrapper" th:style="${chStat.index == 0} ? 'display:block' : 'display:none'">
+                <div class="lesson-wrapper" th:if="${isPurchased || isAdmin}" th:style="${chStat.index == 0} ? 'display:block' : 'display:none'">
                     <ul class="lesson-list">
                         <li th:if="${#lists.isEmpty(chapter.lessons)}" class="text-muted small py-2">Chưa có bài giảng</li>
                         <li class="lesson-item" th:each="lesson : ${chapter.lessons}">
                             <i class="bi bi-play-circle lesson-icon"></i>
                             <span class="lesson-title" th:text="${lesson.title}">Tên bài học</span>
-                            <button class="btn-trial"
-                                    th:if="${isPurchased || isAdmin}"
-                                    th:onclick="'playLesson(' + ${lesson.id} + ')'">
-                                Xem
-                            </button>
-                            <button class="btn-trial" th:if="${!isPurchased && !isAdmin}" disabled>🔒</button>
+                            <button class="btn-trial" th:if="${isPurchased || isAdmin}" th:onclick="'playLesson(' + ${lesson.id} + ')'">Xem</button>
                         </li>
                     </ul>
                 </div>
+            </div>
+
+            <!-- Đánh giá & bình luận -->
+            <h2 class="section-title mt-5">Đánh giá & bình luận</h2>
+            <div class="mb-4">
+                <div class="review-card mb-3" th:if="${#lists.isEmpty(courseReviews)}">
+                    <div class="text-muted">Chưa có đánh giá nào.</div>
+                </div>
+                <div class="review-card mb-3" th:each="rv : ${courseReviews}">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="fw-bold" th:text="${rv.user.fullname != null && !#strings.isEmpty(rv.user.fullname) ? rv.user.fullname : rv.user.email}">
+                            User
+                        </div>
+                        <span class="rating-badge" th:text="${rv.rating} + '/5'">5/5</span>
+                    </div>
+                    <div class="review-meta mb-2" th:text="${rv.updatedAt}">01/01/2026 10:00</div>
+                    <div th:text="${rv.comment}">Bình luận</div>
+                </div>
+            </div>
+
+            <div class="review-card mb-4" th:if="${isLogged && isPurchased}">
+                <form th:action="@{'/courses/' + ${course.id} + '/reviews'}" method="post" class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Điểm đánh giá</label>
+                        <select name="rating" class="form-select" required>
+                            <option value="5" th:selected="${existingReview != null && existingReview.rating == 5}">5 - Xuất sắc</option>
+                            <option value="4" th:selected="${existingReview != null && existingReview.rating == 4}">4 - Tốt</option>
+                            <option value="3" th:selected="${existingReview != null && existingReview.rating == 3}">3 - Ổn</option>
+                            <option value="2" th:selected="${existingReview != null && existingReview.rating == 2}">2 - Chưa hợp lý</option>
+                            <option value="1" th:selected="${existingReview != null && existingReview.rating == 1}">1 - Kém</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Bình luận</label>
+                        <textarea name="comment" class="form-control" rows="4" required
+                                  th:text="${existingReview != null ? existingReview.comment : ''}"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">
+                            Lưu đánh giá
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="review-card mb-4" th:if="${!isLogged}">
+                <div>Bạn cần <a href="/login">đăng nhập</a> để đánh giá khóa học.</div>
+            </div>
+            <div class="review-card mb-4" th:if="${isLogged && !isPurchased}">
+                <div>Bạn cần mua khóa học để đánh giá và bình luận.</div>
             </div>
 
             <!-- Khóa học liên quan -->
@@ -257,7 +296,7 @@
                         <img th:src="${rc.image}" onerror="this.src='https://via.placeholder.com/300x140/6366f1/ffffff?text=Course'">
                         <div class="card-body">
                             <div class="card-title" th:text="${rc.title}">Khóa học liên quan</div>
-                            <div class="card-price" th:text="${@currencyUtils.formatVnd(rc.price)}">0 ₫</div>
+                            <div class="card-price" th:text="${rc.price} + ' $'">$0</div>
                         </div>
                     </a>
                 </div>
@@ -278,15 +317,16 @@
                 <!-- USER -->
                 <div class="card border-0 shadow-lg rounded-3 overflow-hidden" th:if="${!isAdmin}">
                     <div class="card-body text-center p-4">
-                        <h1 class="text-danger fw-black mb-3 display-5 fw-bold" th:text="${@currencyUtils.formatVnd(course.price)}">0 ₫</h1>
+                        <h1 class="text-danger fw-black mb-3 display-5 fw-bold" th:text="${course.price} + ' $'">$0</h1>
 
                         <!-- Chưa mua -->
                         <div th:if="${!isPurchased}">
-                            <button type="button" class="btn btn-danger btn-lg w-100 mb-3 fw-bold rounded-pill shadow-sm"
-                                    th:if="${isLogged}"
-                                    th:attr="onclick=|addToCartAjax(${course.id}, this)|">
-                                <i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ hàng
-                            </button>
+                            <form th:action="@{'/cart/add/' + ${course.id}}" method="POST">
+                                <button type="submit" class="btn btn-danger btn-lg w-100 mb-3 fw-bold rounded-pill shadow-sm"
+                                        th:if="${isLogged}">
+                                    <i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ hàng
+                                </button>
+                            </form>
                             <a class="btn btn-danger btn-lg w-100 mb-3 fw-bold rounded-pill shadow-sm"
                                th:if="${!isLogged}" href="/login">
                                 <i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ hàng
@@ -332,7 +372,7 @@
                         <span class="badge bg-warning text-dark px-3 py-2 mb-3 rounded-pill">
                             <i class="bi bi-gear-fill me-1"></i>Chế độ quản trị
                         </span>
-                        <h1 class="text-secondary mb-3 display-5 fw-bold" th:text="${@currencyUtils.formatVnd(course.price)}">0 ₫</h1>
+                        <h1 class="text-secondary mb-3 display-5 fw-bold" th:text="${course.price} + ' $'">$0</h1>
                         <a th:href="@{'/admin/courses/edit/' + ${course.id}}"
                            class="btn btn-warning btn-lg w-100 mb-3 fw-bold rounded-pill text-white">
                             <i class="bi bi-pencil-square me-2"></i>Chỉnh sửa khóa học
@@ -348,6 +388,7 @@
         </div><!-- /col-lg-4 -->
 
     </div><!-- /row -->
+            </div>
 </div><!-- /container -->
 
 <!-- JAVASCRIPT -->
@@ -365,48 +406,5 @@
         alert('Trình xem bài học #' + id + ' đang được phát triển!');
     }
 </script>
-
-<!-- Toast notification -->
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
-    <div id="cartToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-            <div class="toast-body" id="toastMessage">Thành công!</div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
-    </div>
-</div>
-
-<script>
-    var cartToast;
-    document.addEventListener('DOMContentLoaded', function() {
-        cartToast = new bootstrap.Toast(document.getElementById('cartToast'), { delay: 3000 });
-    });
-    function showToast(message, isSuccess) {
-        var toastEl = document.getElementById('cartToast');
-        var toastMsg = document.getElementById('toastMessage');
-        toastMsg.textContent = message;
-        toastEl.className = 'toast align-items-center border-0 ' + (isSuccess ? 'text-bg-success' : 'text-bg-danger');
-        cartToast = new bootstrap.Toast(toastEl, { delay: 3000 });
-        cartToast.show();
-    }
-    function addToCartAjax(courseId, btn) {
-        var originalText = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Đang thêm...';
-        fetch('/cart/add/' + courseId, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-            btn.disabled = false;
-            btn.innerHTML = originalText;
-            showToast(data.message, data.success);
-        })
-        .catch(function() {
-            btn.disabled = false;
-            btn.innerHTML = originalText;
-            showToast('Có lỗi xảy ra!', false);
-        });
-    }
-</script>
-
 </body>
 </html>

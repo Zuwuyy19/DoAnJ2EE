@@ -4,7 +4,6 @@ import Nhom100.DoAnJ2EE.dto.OrderResponse;
 import Nhom100.DoAnJ2EE.entity.Cart;
 import Nhom100.DoAnJ2EE.entity.User;
 import java.util.List;
-import java.util.Map;
 
 public interface CartService {
     Cart getCartByUser(User user);

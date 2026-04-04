@@ -15,8 +15,11 @@ public class User {
     private Long id;
 
     private String email;
-
     private String password;
+    private String fullname;
+    private String phoneNumber;
+    private String address;
+    private String avatarUrl;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -25,4 +28,6 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
+
+    private boolean enabled = true; // Thêm trường cho phép/khóa tài khoản
 }

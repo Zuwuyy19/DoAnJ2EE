@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <nav th:fragment="navbar(activePage)" class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top py-2">
+        <style>
+            .avatar-circle {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #2563eb, #1d4ed8);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                font-size: 16px;
+                cursor: pointer;
+                box-shadow: 0 2px 10px rgba(37, 99, 235, 0.2);
+                border: 2px solid #fff;
+            }
+            .user-dropdown-toggle {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 4px 8px !important;
+                border-radius: 50px;
+                transition: all 0.3s ease;
+                border: 1px solid transparent !important;
+            }
+            .user-dropdown-toggle:hover {
+                background-color: #f1f5f9;
+            }
+            .user-dropdown-toggle:focus, .user-dropdown-toggle:active {
+                box-shadow: none !important;
+                background-color: #f1f5f9;
+                outline: none !important;
+            }
+            .no-caret::after {
+                display: none !important;
+            }
+            .user-dropdown .dropdown-menu {
+                min-width: 280px;
+                border-radius: 16px;
+                border: none;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+                padding: 12px 0;
+                margin-top: 10px;
+            }
+            .user-dropdown .dropdown-header {
+                padding: 12px 20px;
+                border-bottom: 1px solid #f1f5f9;
+                margin-bottom: 8px;
+            }
+            .user-dropdown .dropdown-item {
+                padding: 10px 20px;
+                font-weight: 500;
+                color: #475569;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                transition: 0.2s;
+            }
+            .user-dropdown .dropdown-item:hover {
+                background-color: #f8fafc;
+                color: #2563eb;
+            }
+            .user-dropdown .dropdown-item i {
+                font-size: 1.2rem;
+            }
+            .user-dropdown .dropdown-divider {
+                border-color: #f1f5f9;
+                margin: 8px 0;
+            }
+            .logout-btn {
+                color: #ef4444 !important;
+            }
+            .logout-btn:hover {
+                background-color: #fef2f2 !important;
+            }
+        </style>
+
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary fs-4 d-flex align-items-center gap-2" href="/">
+                <span>🎓</span> OnlineCourse
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav ms-auto align-items-center gap-1">
+                    <li class="nav-item">
+                        <a class="nav-link px-3 fw-semibold" th:classappend="${activePage == 'home' ? 'active text-primary' : ''}" href="/">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 fw-semibold" th:classappend="${activePage == 'courses' ? 'active text-primary' : ''}" href="/courses">Khóa học</a>
+                    </li>
+                    <li class="nav-item" th:if="${isLogged}">
+                        <a class="nav-link px-3 fw-semibold" th:classappend="${activePage == 'cart' ? 'active text-primary' : ''}" href="/cart">Giỏ hàng</a>
+                    </li>
+                    <li class="nav-item" th:if="${isLogged}">
+                        <a class="nav-link px-3 fw-semibold" th:classappend="${activePage == 'history' ? 'active text-primary' : ''}" href="/orders/history">Lịch sử</a>
+                    </li>
+                    
+                    <li class="nav-item" th:if="${isAdmin}">
+                        <a href="/admin" class="btn btn-warning rounded-pill px-3 py-2 ms-lg-2 fw-bold shadow-sm text-dark text-decoration-none">
+                            <i class="bi bi-shield-lock me-1"></i> QUẢN TRỊ
+                        </a>
+                    </li>
+
+                    <li class="nav-item" th:if="${!isLogged}">
+                        <a class="btn btn-primary rounded-pill px-4 ms-lg-2 fw-bold shadow-sm" href="/login">Đăng nhập</a>
+                    </li>
+                    <li class="nav-item" th:if="${!isLogged}">
+                        <a class="btn btn-outline-primary rounded-pill px-4 fw-bold" href="/register">Đăng ký</a>
+                    </li>
+
+                    <!-- USER DROPDOWN -->
+                    <li class="nav-item dropdown user-dropdown ms-lg-3" th:if="${isLogged}">
+                        <a class="nav-link dropdown-toggle no-caret user-dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="avatar-circle" th:text="${userDisplayName != null ? #strings.substring(userDisplayName,0,1).toUpperCase() : 'U'}">U</div>
+                            <i class="bi bi-chevron-down text-muted small"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li class="dropdown-header">
+                                <div class="fw-bold text-dark" th:text="${userDisplayName ?: 'Tài khoản'}">User Email</div>
+                                <div class="text-muted small" th:text="${userHandle ?: '@user'}">@handle</div>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/account">
+                                    <i class="bi bi-person-circle"></i> Hồ sơ & Bảo mật
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/orders/history">
+                                    <i class="bi bi-bag-check"></i> Đơn hàng của tôi
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form th:action="@{/logout}" method="post">
+                                    <button type="submit" class="dropdown-item logout-btn border-0 w-100 text-start">
+                                        <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</body>
+</html>
