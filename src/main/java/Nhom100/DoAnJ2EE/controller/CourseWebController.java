@@ -144,7 +144,7 @@ public class CourseWebController {
             User user = userRepository.findByEmail(auth.getName()).orElse(null);
             if (user != null) {
                 purchasedCourseIds = orderDetailRepository.findByOrderUserId(user.getId()).stream()
-                        .filter(od -> od.getOrder() != null && "COMPLETED".equals(od.getOrder().getStatus()))
+                        .filter(od -> od.getOrder() != null && ("COMPLETED".equals(od.getOrder().getStatus()) || "PAID".equals(od.getOrder().getStatus())))
                         .map(od -> od.getCourse().getId())
                         .collect(Collectors.toSet());
             }

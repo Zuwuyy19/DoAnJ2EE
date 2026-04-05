@@ -163,7 +163,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng với mã: " + paymentCode));
 
         if ("00".equals(responseCode)) {
-            order.setStatus("PAID");
+            order.setStatus("COMPLETED");
             order.setTransactionId(txnRef);
             
             // Clear cart for the user

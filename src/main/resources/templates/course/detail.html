@@ -245,7 +245,7 @@
                         <li class="lesson-item" th:each="lesson : ${chapter.lessons}">
                             <i class="bi bi-play-circle lesson-icon"></i>
                             <span class="lesson-title" th:text="${lesson.title}">Tên bài học</span>
-                            <button class="btn-trial" th:if="${isPurchased || isAdmin}" th:attr="onclick='window.location.href=&quot;/learn/' + ${lesson.id} + '&quot;'">Xem</button>
+                            <button class="btn-trial" th:if="${isPurchased || isAdmin}" th:attr="onclick='window.location.href=&quot;/learn/' + ${course.id} + '?lessonId=' + ${lesson.id} + '&quot;'">Xem</button>
                         </li>
                     </ul>
                 </div>
