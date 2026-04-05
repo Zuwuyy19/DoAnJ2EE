@@ -46,9 +46,6 @@ public class UserService {
     }
 
     public void deleteUser(Long id) {
-        userRepository.findById(id).ifPresent(user -> {
-            user.setEnabled(false);
-            userRepository.save(user);
-        });
+        userRepository.deleteById(id);
     }
 }

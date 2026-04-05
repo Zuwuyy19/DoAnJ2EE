@@ -21,80 +21,84 @@
 
 <div th:replace="~{fragments/admin_navbar :: admin_navbar(activePage='purchased')}"></div>
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold text-dark mb-1">Quản lý Nội dung & Lượt mua</h2>
-            <p class="text-muted mb-0">Theo dõi doanh số và cập nhật nội dung cho học viên</p>
-        </div>
-    </div>
+<div class="container-fluid px-lg-5 mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-11 col-xl-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark mb-1">Quản lý Nội dung & Lượt mua</h2>
+                    <p class="text-muted mb-0">Theo dõi doanh số và cập nhật nội dung cho học viên</p>
+                </div>
+            </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="ps-4 py-3">ID</th>
-                            <th class="py-3">Thông tin khóa học</th>
-                            <th class="py-3">Giá bán</th>
-                            <th class="py-3 text-center">Lượt mua</th>
-                            <th class="py-3">Mua gần nhất</th>
-                            <th class="py-3 text-center">Trạng thái nội dung</th>
-                            <th class="text-end pe-4 py-3">Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="item : ${purchasedCourses}">
-                            <td class="ps-4">
-                                <span class="badge bg-light text-secondary border fw-medium" th:text="'#' + ${item.courseId}">#0</span>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 40px; height: 40px; background-color: #6366f1 !important;">
-                                        <i class="bi bi-journal-check"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold text-dark" th:text="${item.courseName}">Course Name</div>
-                                        <div class="small text-muted" th:text="${item.courseTitle}">Course Title</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="badge badge-price px-3 py-2" th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</span>
-                            </td>
-                            <td class="text-center">
-                                <span class="badge badge-info rounded-pill px-3 py-2" th:text="${item.purchaseCount}">0</span>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center gap-2 small text-muted">
-                                    <i class="bi bi-clock-history"></i>
-                                    <span th:text="${item.lastPurchaseDate != null ? item.lastPurchaseDate : 'Chưa có'}">Date</span>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <span class="badge badge-success px-3 py-2" th:if="${item.hasDetail}">
-                                    <i class="bi bi-check-circle me-1"></i>Đã có chi tiết
-                                </span>
-                                <span class="badge badge-warning px-3 py-2" th:if="${!item.hasDetail}">
-                                    <i class="bi bi-exclamation-circle me-1"></i>Chưa có chi tiết
-                                </span>
-                            </td>
-                            <td class="text-end pe-4">
-                                <a th:href="@{'/admin/courses/' + ${item.courseId} + '/content'}"
-                                   class="btn btn-sm btn-outline-primary btn-pill px-3 shadow-sm" title="Cập nhật chương trình học">
-                                    <i class="bi bi-pencil-square me-1"></i>Cập nhật nội dung
-                                </a>
-                            </td>
-                        </tr>
-                        <tr th:if="${#lists.isEmpty(purchasedCourses)}">
-                            <td colspan="7" class="text-center py-5 text-muted">
-                                <i class="bi bi-cart-x fs-1 d-block mb-3 opacity-50"></i>
-                                Chưa có khóa học nào được mua.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="card shadow-sm border-0 overflow-hidden">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light text-secondary">
+                                <tr>
+                                    <th class="ps-4 py-3" style="width: 80px;">ID</th>
+                                    <th class="py-3">Thông tin khóa học</th>
+                                    <th class="py-3 text-center">Giá bán</th>
+                                    <th class="py-3 text-center">Lượt mua</th>
+                                    <th class="py-3">Mua gần nhất</th>
+                                    <th class="py-3 text-center">Trạng thái nội dung</th>
+                                    <th class="text-end pe-4 py-3">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="item : ${purchasedCourses}">
+                                    <td class="ps-4">
+                                        <span class="fw-medium text-secondary" th:text="'#' + ${item.courseId}"></span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 40px; height: 40px; background-color: #6366f1 !important;">
+                                                <i class="bi bi-journal-check"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark" th:text="${item.courseName}">Course Name</div>
+                                                <div class="small text-muted" th:text="${item.courseTitle}">Course Title</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge badge-price px-3 py-2" th:text="${@currencyUtils.formatVnd(item.price)}">0 VNĐ</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge badge-info rounded-pill px-3 py-2" th:text="${item.purchaseCount}">0</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2 small text-muted">
+                                            <i class="bi bi-clock-history"></i>
+                                            <span th:text="${item.lastPurchaseDate != null ? #temporals.format(item.lastPurchaseDate, 'dd/MM/yyyy HH:mm') : 'Chưa có'}">Date</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge badge-success rounded-pill px-3 py-2" th:if="${item.hasDetail}">
+                                            <i class="bi bi-check-circle me-1"></i>Đã có chi tiết
+                                        </span>
+                                        <span class="badge badge-warning rounded-pill px-3 py-2" th:if="${!item.hasDetail}">
+                                            <i class="bi bi-exclamation-circle me-1"></i>Chưa có chi tiết
+                                        </span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a th:href="@{'/admin/courses/' + ${item.courseId} + '/content'}"
+                                           class="btn btn-sm btn-outline-primary btn-pill px-4 shadow-sm" title="Cập nhật chương trình học">
+                                            <i class="bi bi-gear-fill me-1"></i>Cấu trúc nội dung
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(purchasedCourses)}">
+                                    <td colspan="7" class="text-center py-5 text-muted">
+                                        <i class="bi bi-cart-x fs-1 d-block mb-3 opacity-50"></i>
+                                        Chưa có khóa học nào được mua.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

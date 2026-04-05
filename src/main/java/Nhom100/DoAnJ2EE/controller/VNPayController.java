@@ -10,11 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 
 import java.util.Map;
 
@@ -120,55 +120,102 @@ public class VNPayController {
         try {
             // Lấy toàn bộ params từ VNPay gửi về
             Map<String, String> params = Nhom100.DoAnJ2EE.config.VNPayConfig.getReturnFields(request);
-
-            // Debug: log TẤT CẢ params VNPay gửi về
-            System.err.println("[VNPay Return] ===== RAW PARAMS FROM VNPAY =====");
-            for (Map.Entry<String, String> e : params.entrySet()) {
-                System.err.println("  " + e.getKey() + " = " + e.getValue());
-            }
-
-            // Xác minh hash — dùng copy vì verifyReturn sẽ xóa hash keys khỏi map
-            boolean isValid = vnPayConfig.verifyReturn(new java.util.HashMap<>(params));
-            System.err.println("[VNPay Return] Hash valid: " + isValid);
-
-            // Đọc params — keys đã được chuyển lowercase trong getReturnFields
+            
+            // Xử lý đơn hàng qua Service
+            orderService.handleVNPayReturn(params);
+            
             String responseCode = params.get("vnp_responsecode");
-            String orderInfo    = params.get("vnp_orderinfo");
-            String txnRef       = params.get("vnp_txnref");
+            String paymentCode  = params.get("vnp_orderinfo");
 
-            System.err.println("[VNPay Return] ResponseCode=" + responseCode
-                    + ", OrderInfo=" + orderInfo + ", TxnRef=" + txnRef);
-
-            if (orderInfo == null || orderInfo.isEmpty()) {
-                redirectAttributes.addFlashAttribute("errorMessage",
-                        "Không nhận được mã thanh toán từ VNPay!");
-                return "redirect:/courses";
-            }
-
-            // Cập nhật trạng thái đơn hàng
-            Order order = orderService.handleVNPayReturn(params);
-
-            if ("00".equals(responseCode)) {
-                if (order != null && order.getOrderDetails() != null
-                        && !order.getOrderDetails().isEmpty()) {
-                    Long courseId = order.getOrderDetails().get(0).getCourse().getId();
-                    redirectAttributes.addFlashAttribute("successMessage",
-                            "Thanh toán thành công! Bạn đã có quyền truy cập khóa học.");
-                    return "redirect:/courses/" + courseId;
-                }
-                redirectAttributes.addFlashAttribute("successMessage",
-                        "Thanh toán thành công!");
-            } else {
-                redirectAttributes.addFlashAttribute("errorMessage",
-                        "Thanh toán thất bại hoặc bị hủy (Mã: " + responseCode + ")");
-            }
+            // Redirect về trang kết quả thay vì quay về course detail trực tiếp
+            return "redirect:/vnpay/result?paymentCode=" + paymentCode + "&responseCode=" + responseCode;
 
         } catch (Exception e) {
             System.err.println("[VNPay Return] Error: " + e.getMessage());
-            e.printStackTrace();
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
+            return "redirect:/courses";
+        }
+    }
+
+    /**
+     * GET /vnpay/result
+     * Trang kết quả thanh toán hiển thị cho người dùng
+     */
+    @GetMapping("/result")
+    public String paymentResult(
+            @RequestParam String paymentCode,
+            @RequestParam String responseCode,
+            Model model
+    ) {
+        User user = getCurrentUser();
+        addAuthAttributes(model, user);
+
+        Order order = orderService.getOrderByPaymentCode(paymentCode);
+        
+        model.addAttribute("status", "00".equals(responseCode) ? "SUCCESS" : "FAILED");
+        model.addAttribute("paymentCode", paymentCode);
+        
+        if (order != null) {
+            model.addAttribute("amount", order.getTotalAmount());
+            model.addAttribute("transactionId", order.getTransactionId());
+            model.addAttribute("orderInfo", "Thanh toán khóa học");
+        } else {
+            model.addAttribute("amount", 0.0);
+            model.addAttribute("orderInfo", "Không tìm thấy đơn hàng");
         }
 
-        return "redirect:/courses";
+        if (!"00".equals(responseCode)) {
+            model.addAttribute("message", "Thanh toán không thành công (Mã lỗi: " + responseCode + ")");
+        }
+
+        return "order/payment-result";
+    }
+
+    /**
+     * GET /vnpay/vnpay-ipn
+     * Endpoint IPN (Backend-to-Backend) để VNPay gọi sang
+     */
+    @GetMapping("/vnpay-ipn")
+    @ResponseBody
+    public ResponseEntity<?> vnpayIPN(HttpServletRequest request) {
+        try {
+            Map<String, String> params = Nhom100.DoAnJ2EE.config.VNPayConfig.getReturnFields(request);
+            
+            // Log for debugging
+            System.out.println("[VNPay IPN] Received notification for: " + params.get("vnp_txnref"));
+
+            // Xác minh và cập nhật đơn hàng
+            orderService.handleVNPayReturn(params);
+
+            // Phản hồi VNPay theo chuẩn (JSON)
+            Map<String, String> response = new java.util.HashMap<>();
+            response.put("RspCode", "00");
+            response.put("Message", "Confirm Success");
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            Map<String, String> response = new java.util.HashMap<>();
+            response.put("RspCode", "99");
+            response.put("Message", "Unknown error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    private void addAuthAttributes(Model model, User user) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = false;
+        boolean isLogged = user != null;
+        String userDisplayName = null;
+        String userHandle = null;
+        if (isLogged) {
+            isAdmin = auth.getAuthorities().stream()
+               .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            userDisplayName = auth.getName();
+            userHandle = "@" + auth.getName();
+        }
+        model.addAttribute("isAdmin", isAdmin);
+        model.addAttribute("isLogged", isLogged);
+        model.addAttribute("userDisplayName", userDisplayName);
+        model.addAttribute("userHandle", userHandle);
     }
 }

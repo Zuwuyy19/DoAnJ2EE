@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -55,6 +56,7 @@
             line-height: 1.3;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -156,7 +158,7 @@
             display: none;
         }
 
-        .chapter-item.open > .lesson-list {
+        .chapter-item.open>.lesson-list {
             display: block;
         }
 
@@ -184,8 +186,13 @@
             flex-shrink: 0;
         }
 
-        .lesson-status-icon.completed { color: #22c55e; }
-        .lesson-status-icon.pending { color: #cbd5e1; }
+        .lesson-status-icon.completed {
+            color: #22c55e;
+        }
+
+        .lesson-status-icon.pending {
+            color: #cbd5e1;
+        }
 
         .lesson-title {
             font-size: 0.85rem;
@@ -236,7 +243,9 @@
             transition: color 0.2s;
         }
 
-        .topbar-back:hover { color: var(--primary); }
+        .topbar-back:hover {
+            color: var(--primary);
+        }
 
         .topbar-title {
             font-weight: 600;
@@ -292,8 +301,16 @@
             inset: 0;
         }
 
-        .video-placeholder i { font-size: 3.5rem; opacity: 0.4; }
-        .video-placeholder p { opacity: 0.5; font-size: 0.88rem; margin: 0; }
+        .video-placeholder i {
+            font-size: 3.5rem;
+            opacity: 0.4;
+        }
+
+        .video-placeholder p {
+            opacity: 0.5;
+            font-size: 0.88rem;
+            margin: 0;
+        }
 
         .no-video-msg {
             aspect-ratio: 16 / 9;
@@ -309,8 +326,15 @@
             inset: 0;
         }
 
-        .no-video-msg i { font-size: 2.5rem; opacity: 0.3; }
-        .no-video-msg p { margin: 0; font-size: 0.88rem; }
+        .no-video-msg i {
+            font-size: 2.5rem;
+            opacity: 0.3;
+        }
+
+        .no-video-msg p {
+            margin: 0;
+            font-size: 0.88rem;
+        }
 
         /* iframe/video inside videoCardInner fills the parent */
         #videoCardInner iframe,
@@ -350,15 +374,22 @@
             background: none;
         }
 
-        .learn-tab:hover { color: var(--primary); }
+        .learn-tab:hover {
+            color: var(--primary);
+        }
 
         .learn-tab.active {
             color: var(--primary);
             border-bottom-color: var(--primary);
         }
 
-        .tab-panel { display: none; }
-        .tab-panel.active { display: block; }
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
 
         /* Lesson info */
         .lesson-info {
@@ -407,20 +438,34 @@
             transition: background 0.15s;
         }
 
-        .doc-item:last-child { border-bottom: none; }
+        .doc-item:last-child {
+            border-bottom: none;
+        }
 
-        .doc-item:hover { background: #f8fafc; }
+        .doc-item:hover {
+            background: #f8fafc;
+        }
 
         .doc-icon {
             font-size: 1.4rem;
             flex-shrink: 0;
         }
 
-        .doc-icon.ppt { color: #e88b2d; }
-        .doc-icon.pdf { color: #e53e3e; }
-        .doc-icon.default { color: #64748b; }
+        .doc-icon.ppt {
+            color: #e88b2d;
+        }
 
-        .doc-info { flex: 1; }
+        .doc-icon.pdf {
+            color: #e53e3e;
+        }
+
+        .doc-icon.default {
+            color: #64748b;
+        }
+
+        .doc-info {
+            flex: 1;
+        }
 
         .doc-name {
             font-weight: 600;
@@ -479,7 +524,9 @@
             gap: 8px;
         }
 
-        .btn-mark-done:hover { background: var(--primary-dark); }
+        .btn-mark-done:hover {
+            background: var(--primary-dark);
+        }
 
         .btn-mark-undo {
             background: white;
@@ -496,7 +543,10 @@
             gap: 8px;
         }
 
-        .btn-mark-undo:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-mark-undo:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
 
         /* ── MOBILE TOGGLE ── */
         .sidebar-toggle-btn {
@@ -510,7 +560,10 @@
 
         /* ── RESPONSIVE ── */
         @media (max-width: 768px) {
-            .sidebar-toggle-btn { display: block; }
+            .sidebar-toggle-btn {
+                display: block;
+            }
+
             .learn-sidebar {
                 position: fixed;
                 left: 0;
@@ -518,18 +571,23 @@
                 z-index: 1050;
                 transform: translateX(-100%);
             }
+
             .learn-sidebar.open {
                 transform: translateX(0);
-                box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+                box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
             }
+
             .sidebar-overlay {
                 display: none;
                 position: fixed;
                 inset: 0;
-                background: rgba(0,0,0,0.4);
+                background: rgba(0, 0, 0, 0.4);
                 z-index: 1049;
             }
-            .sidebar-overlay.open { display: block; }
+
+            .sidebar-overlay.open {
+                display: block;
+            }
         }
 
         /* ── TOAST ── */
@@ -544,7 +602,7 @@
             background: white;
             border-radius: 10px;
             padding: 12px 18px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -553,561 +611,702 @@
             animation: slideIn 0.3s ease;
         }
 
-        .custom-toast.success .toast-icon { color: #22c55e; }
-        .custom-toast.error .toast-icon { color: #ef4444; }
+        .custom-toast.success .toast-icon {
+            color: #22c55e;
+        }
+
+        .custom-toast.error .toast-icon {
+            color: #ef4444;
+        }
 
         @keyframes slideIn {
-            from { transform: translateX(120%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
     </style>
 </head>
+
 <body>
 
-<!-- Sidebar overlay (mobile) -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <!-- Sidebar overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-<div class="learn-layout">
+    <div class="learn-layout">
 
-    <!-- ═══════════ SIDEBAR ═══════════ -->
-    <aside class="learn-sidebar" id="learnSidebar">
-        <!-- Header -->
-        <div class="sidebar-header">
-            <div class="d-flex align-items-center gap-2 mb-2">
-                <i class="bi bi-mortarboard-fill" style="font-size: 1.1rem;"></i>
-                <span style="font-size: 0.75rem; opacity: 0.7;">Trang học</span>
-            </div>
-            <div class="course-name" th:text="${course.title}">Tên khóa học</div>
-        </div>
-
-        <!-- Progress -->
-        <div class="sidebar-progress">
-            <div class="progress-track">
-                <span class="fw-bold" style="color: var(--primary);">
-                    [[${completedLessons}]] / [[${totalLessons}]] bài
-                </span>
-                <span style="float: right;">
-                    [[${#numbers.formatDecimal(percentComplete, 1, 0)}]]%
-                </span>
-            </div>
-            <div class="progress-bar-custom">
-                <div class="progress-bar-fill"
-                     th:style="'width:' + ${percentComplete} + '%'">
+        <!-- ═══════════ SIDEBAR ═══════════ -->
+        <aside class="learn-sidebar" id="learnSidebar">
+            <!-- Header -->
+            <div class="sidebar-header">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-mortarboard-fill" style="font-size: 1.1rem;"></i>
+                    <span style="font-size: 0.75rem; opacity: 0.7;">Trang học</span>
                 </div>
+                <div class="course-name" th:text="${course.title}">Tên khóa học</div>
             </div>
-        </div>
 
-        <!-- Chapters -->
-        <div class="sidebar-body">
-            <div class="chapter-item"
-                 th:each="chapter, chStat : ${course.chapters}"
-                 th:classappend="${chStat.index == 0} ? 'open'"
-                 th:attr="data-chapter-id=${chapter.id}">
-                <div class="chapter-toggle"
-                     onclick="toggleChapter(this)">
-                    <div class="ch-title">
-                        <i class="bi bi-folder2-open me-1 text-warning" style="font-size: 0.85rem;"></i>
-                        Chương [[${chStat.count}]]: <span th:text="${chapter.title}">Tên chương</span>
-                    </div>
-                    <span class="ch-count">
-                        <span th:text="${chapter.lessons?.size() ?: 0}">0</span>
-                        <i class="bi bi-chevron-down ch-icon"></i>
+            <!-- Progress -->
+            <div class="sidebar-progress">
+                <div class="progress-track">
+                    <span class="fw-bold" style="color: var(--primary);">
+                        [[${completedLessons}]] / [[${totalLessons}]] bài
+                    </span>
+                    <span style="float: right;">
+                        [[${#numbers.formatDecimal(percentComplete, 1, 0)}]]%
                     </span>
                 </div>
-                <ul class="lesson-list"
-                    th:classappend="${chStat.index != 0} ? 'collapsed'">
-                    <li th:if="${#lists.isEmpty(chapter.lessons)}" class="text-muted small p-3">
-                        Chưa có bài giảng
-                    </li>
-                    <li class="lesson-item"
-                        th:each="lesson : ${chapter.lessons}"
-                        th:data-lesson-id="${lesson.id}"
-                        th:data-lesson-title="${lesson.title}"
-                        th:data-lesson-video="${lesson.videoUrl}"
-                        th:data-chapter-title="${chapter.title}"
-                        th:onclick="'loadLesson(' + ${lesson.id} + ')'">
+                <div class="progress-bar-custom">
+                    <div class="progress-bar-fill" th:style="'width:' + ${percentComplete} + '%'">
+                    </div>
+                </div>
+            </div>
 
-                        <!-- Status icon: filled check if completed, empty circle if not -->
-                        <span class="lesson-status-icon completed"
-                              th:if="${lessonCompletedMap.containsKey(lesson.id) && lessonCompletedMap.get(lesson.id)}">
+            <!-- Chapters -->
+            <div class="sidebar-body">
+                <div class="chapter-item" th:each="chapter, chStat : ${course.chapters}"
+                    th:classappend="${chStat.index == 0} ? 'open'" 
+                    th:attr="data-chapter-id=${chapter.id}, data-chapter-video=${chapter.contentVideoUrl}">
+                    <div class="chapter-toggle" onclick="toggleChapter(this)">
+                        <div class="ch-title">
+                            <i class="bi bi-folder2-open me-1 text-warning" style="font-size: 0.85rem;"></i>
+                            Chương [[${chStat.count}]]: <span th:text="${chapter.title}">Tên chương</span>
+                        </div>
+                        <span class="ch-count">
+                            <span th:text="${chapter.lessons?.size() ?: 0}">0</span>
+                            <i class="bi bi-chevron-down ch-icon"></i>
+                        </span>
+                    </div>
+                    <ul class="lesson-list" th:classappend="${chStat.index != 0} ? 'collapsed'">
+                        <li th:if="${#lists.isEmpty(chapter.lessons)}" class="text-muted small p-3">
+                            Chưa có bài giảng
+                        </li>
+                        <li class="lesson-item" th:each="lesson : ${chapter.lessons}" th:data-lesson-id="${lesson.id}"
+                            th:data-lesson-title="${lesson.title}" th:data-lesson-video="${lesson.videoUrl}"
+                            th:data-chapter-title="${chapter.title}" th:onclick="'loadLesson(' + ${lesson.id} + ')'">
+
+                            <!-- Status icon: filled check if completed, empty circle if not -->
+                            <span class="lesson-status-icon completed"
+                                th:if="${lessonCompletedMap.containsKey(lesson.id) && lessonCompletedMap.get(lesson.id)}">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </span>
+                            <span class="lesson-status-icon pending"
+                                th:unless="${lessonCompletedMap.containsKey(lesson.id) && lessonCompletedMap.get(lesson.id)}">
+                                <i class="bi bi-circle"></i>
+                            </span>
+
+                            <span class="lesson-title" th:text="${lesson.title}">Tên bài học</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- No chapters -->
+                <div th:if="${#lists.isEmpty(course.chapters)}" class="text-center p-4 text-muted">
+                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                    Khóa học đang cập nhật nội dung
+                </div>
+            </div>
+        </aside>
+
+        <!-- ═══════════ MAIN CONTENT ═══════════ -->
+        <main class="learn-content">
+
+            <!-- Topbar -->
+            <div class="content-topbar">
+                <button class="sidebar-toggle-btn" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
+                <a th:href="@{'/courses/' + ${course.id}}" class="topbar-back">
+                    <i class="bi bi-arrow-left"></i>
+                    Quay lại khóa học
+                </a>
+                <span class="topbar-title" th:text="${course.title}">Tên khóa học</span>
+            </div>
+
+            <!-- Content body -->
+            <div class="content-body">
+
+                <!-- Video card (inside scrollable area) -->
+                <div class="video-card" id="videoCard">
+                    <div class="video-card-inner" id="videoCardInner">
+                        <div class="video-placeholder" id="videoPlaceholder">
+                            <i class="bi bi-play-circle"></i>
+                            <p>Chọn một bài học để bắt đầu</p>
+                        </div>
+                        <div id="noVideoMsg" class="no-video-msg" style="display:none;">
+                            <i class="bi bi-exclamation-circle"></i>
+                            <p>Bài học này chưa có video.</p>
+                        </div>
+                        <div id="videoContainer" style="display:none;"></div>
+                    </div>
+                </div>
+
+                <!-- Lesson info -->
+                <div class="lesson-info" id="lessonInfo">
+                    <div class="chapter-label" id="currentChapterLabel">Chương</div>
+                    <h4 id="currentLessonTitle" th:text="${course.title}">Tên bài học</h4>
+
+                    <!-- Mark complete / undo -->
+                    <div class="mark-actions" id="markActions" style="display:none;">
+                        <button class="btn-mark-done" id="btnMarkDone" onclick="markComplete()">
                             <i class="bi bi-check-circle-fill"></i>
-                        </span>
-                        <span class="lesson-status-icon pending" th:unless="${lessonCompletedMap.containsKey(lesson.id) && lessonCompletedMap.get(lesson.id)}">
-                            <i class="bi bi-circle"></i>
-                        </span>
-
-                        <span class="lesson-title" th:text="${lesson.title}">Tên bài học</span>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- No chapters -->
-            <div th:if="${#lists.isEmpty(course.chapters)}" class="text-center p-4 text-muted">
-                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                Khóa học đang cập nhật nội dung
-            </div>
-        </div>
-    </aside>
-
-    <!-- ═══════════ MAIN CONTENT ═══════════ -->
-    <main class="learn-content">
-
-        <!-- Topbar -->
-        <div class="content-topbar">
-            <button class="sidebar-toggle-btn" onclick="toggleSidebar()">
-                <i class="bi bi-list"></i>
-            </button>
-            <a th:href="@{'/courses/' + ${course.id}}" class="topbar-back">
-                <i class="bi bi-arrow-left"></i>
-                Quay lại khóa học
-            </a>
-            <span class="topbar-title" th:text="${course.title}">Tên khóa học</span>
-        </div>
-
-        <!-- Content body -->
-        <div class="content-body">
-
-            <!-- Video card (inside scrollable area) -->
-            <div class="video-card" id="videoCard">
-                <div class="video-card-inner" id="videoCardInner">
-                    <div class="video-placeholder" id="videoPlaceholder">
-                        <i class="bi bi-play-circle"></i>
-                        <p>Chọn một bài học để bắt đầu</p>
+                            Đánh dấu hoàn thành
+                        </button>
+                        <button class="btn-mark-undo" id="btnMarkUndo" onclick="markIncomplete()" style="display:none;">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                            Bỏ đánh dấu
+                        </button>
                     </div>
-                    <div id="noVideoMsg" class="no-video-msg" style="display:none;">
-                        <i class="bi bi-exclamation-circle"></i>
-                        <p>Bài học này chưa có video.</p>
-                    </div>
-                    <div id="videoContainer" style="display:none;"></div>
                 </div>
-            </div>
 
-            <!-- Lesson info -->
-            <div class="lesson-info" id="lessonInfo">
-                <div class="chapter-label" id="currentChapterLabel">Chương</div>
-                <h4 id="currentLessonTitle" th:text="${course.title}">Tên bài học</h4>
-
-                <!-- Mark complete / undo -->
-                <div class="mark-actions" id="markActions" style="display:none;">
-                    <button class="btn-mark-done" id="btnMarkDone"
-                            onclick="markComplete()">
-                        <i class="bi bi-check-circle-fill"></i>
-                        Đánh dấu hoàn thành
+                <!-- Tabs: Nội dung | Tài liệu -->
+                <div class="learn-tabs">
+                    <button class="learn-tab active" id="tabVideo" onclick="switchTab('video')">
+                        <i class="bi bi-info-circle me-1"></i>Nội dung bài học
                     </button>
-                    <button class="btn-mark-undo" id="btnMarkUndo"
-                            onclick="markIncomplete()" style="display:none;">
-                        <i class="bi bi-arrow-counterclockwise"></i>
-                        Bỏ đánh dấu
+                    <button class="learn-tab" id="tabDoc" onclick="switchTab('doc')">
+                        <i class="bi bi-file-earmark-text me-1"></i>Tài liệu
                     </button>
                 </div>
-            </div>
 
-            <!-- Tabs: Video | Tài liệu -->
-            <div class="learn-tabs">
-                <button class="learn-tab active" id="tabVideo" onclick="switchTab('video')">
-                    <i class="bi bi-play-circle me-1"></i>Video bài giảng
-                </button>
-                <button class="learn-tab" id="tabDoc" onclick="switchTab('doc')">
-                    <i class="bi bi-file-earmark-text me-1"></i>Tài liệu
-                </button>
-            </div>
-
-            <!-- Tab: Video -->
-            <div class="tab-panel active" id="panelVideo">
-                <div class="alert alert-light border text-center py-4" id="noVideoMsg">
-                    <i class="bi bi-camera-video-off fs-3 d-block mb-2 text-muted"></i>
-                    <span class="text-muted">Bài học này chưa có video.</span>
-                </div>
-                <!-- Video container (JS sẽ inject video ở đây) -->
-                <div id="videoContainer" style="display:none;"></div>
-            </div>
-
-            <!-- Tab: Tài liệu -->
-            <div class="tab-panel" id="panelDoc">
-                <div class="doc-section">
-                    <!-- Tài liệu riêng theo chương -->
-                    <div class="doc-section-header" id="chapterDocHeader" style="display:none;">
-                        <i class="bi bi-file-earmark-ppt text-warning me-1"></i>Tài liệu chương
-                    </div>
-                    <div id="chapterDocs">
-                        <div class="no-doc" id="noChapterDoc">
-                            <i class="bi bi-file-earmark-x fs-4 d-block mb-1"></i>
-                            Chương này chưa có tài liệu PPT
-                        </div>
-                    </div>
-
-                    <!-- Tài liệu chung của khóa học -->
-                    <div class="doc-section-header" style="display:none;" id="courseDocHeader">
-                        <i class="bi bi-book text-primary me-1"></i>Giáo trình khóa học
-                    </div>
-                    <div id="courseDocs">
-                        <div class="no-doc" id="noCourseDoc">
-                            <i class="bi bi-file-earmark-x fs-4 d-block mb-1"></i>
-                            Khóa học chưa có tài liệu đính kèm
+                <!-- Tab: Nội dung (Description/About) -->
+                <div class="tab-panel active" id="panelVideo">
+                    <div class="lesson-description-content">
+                        <div class="alert alert-light border">
+                            <i class="bi bi-info-circle me-2 text-primary"></i>
+                            Chào mừng bạn đến với bài học <b><span id="currentLessonTitleDesc">...</span></b>.
+                            Hãy theo dõi video và tài liệu đính kèm để học tập tốt nhất.
                         </div>
                     </div>
                 </div>
+
+                <!-- Tab: Tài liệu -->
+                <div class="tab-panel" id="panelDoc">
+                    <div class="doc-section">
+                        <!-- Tài liệu riêng cho bài học (Show current lesson's doc if it's a file) -->
+                        <div id="lessonDocWrapper" style="display:none; margin-bottom: 20px;">
+                            <div class="doc-section-header">
+                                <i class="bi bi-file-earmark-text-fill text-success me-1"></i>Tài liệu bài học: <span
+                                    id="currentLessonTitleDoc"></span>
+                            </div>
+                            <div id="lessonDocContent"></div>
+                        </div>
+
+                        <!-- Tài liệu riêng theo chương (Loaded by Thymeleaf, Toggled by JS) -->
+                        <div th:each="chapter : ${course.chapters}" th:id="'chapter-doc-' + ${chapter.id}"
+                            class="chapter-doc-wrapper" style="display:none;">
+                            <div class="doc-section-header">
+                                <i class="bi bi-file-earmark-ppt-fill text-warning me-1"></i>Tài liệu chương:
+                                [[${chapter.title}]]
+                            </div>
+                            <div class="doc-item"
+                                th:if="${chapter.contentPptUrl != null and !#strings.isEmpty(chapter.contentPptUrl)}">
+                                <i class="doc-icon ppt bi bi-file-earmark-ppt-fill"></i>
+                                <div class="doc-info">
+                                    <div class="doc-name">Slide bài giảng (PowerPoint)</div>
+                                    <div class="doc-type">PPTX</div>
+                                </div>
+                                <a th:href="${chapter.contentPptUrl}" target="_blank" class="doc-download">
+                                    <i class="bi bi-download me-1"></i>Tải về
+                                </a>
+                            </div>
+                            <div class="no-doc"
+                                th:unless="${chapter.contentPptUrl != null and !#strings.isEmpty(chapter.contentPptUrl)}">
+                                <i class="bi bi-file-earmark-x fs-4 d-block mb-1"></i>
+                                Chương này chưa có tài liệu PPT
+                            </div>
+                        </div>
+
+                        <!-- Tài liệu chung của khóa học (Always show header, then content or empty msg) -->
+                        <div class="mt-4">
+                            <div class="doc-section-header">
+                                <i class="bi bi-journal-bookmark-fill text-primary me-1"></i>Tài liệu chung của khóa học
+                            </div>
+
+                            <div class="doc-list-container">
+                                <!-- Word/PDF -->
+                                <div class="doc-item"
+                                    th:if="${course.purchasedDocUrl != null and !#strings.isEmpty(course.purchasedDocUrl)}">
+                                    <i class="doc-icon pdf bi bi-file-earmark-pdf-fill"></i>
+                                    <div class="doc-info">
+                                        <div class="doc-name">Giáo trình khóa học (Word/PDF)</div>
+                                        <div class="doc-type">DOC/PDF</div>
+                                    </div>
+                                    <a th:href="${course.purchasedDocUrl}" target="_blank" class="doc-download">
+                                        <i class="bi bi-download me-1"></i>Tải về
+                                    </a>
+                                </div>
+
+                                <!-- PowerPoint -->
+                                <div class="doc-item"
+                                    th:if="${course.purchasedPptUrl != null and !#strings.isEmpty(course.purchasedPptUrl)}">
+                                    <i class="doc-icon ppt bi bi-file-earmark-ppt-fill"></i>
+                                    <div class="doc-info">
+                                        <div class="doc-name">Slide tổng quan (PowerPoint)</div>
+                                        <div class="doc-type">PPTX</div>
+                                    </div>
+                                    <a th:href="${course.purchasedPptUrl}" target="_blank" class="doc-download">
+                                        <i class="bi bi-download me-1"></i>Tải về
+                                    </a>
+                                </div>
+
+                                <!-- Extra Video -->
+                                <div class="doc-item"
+                                    th:if="${course.purchasedVideoUrl != null and !#strings.isEmpty(course.purchasedVideoUrl)}">
+                                    <i class="doc-icon bi bi-play-btn-fill text-primary"></i>
+                                    <div class="doc-info">
+                                        <div class="doc-name">Video độc quyền đính kèm</div>
+                                        <div class="doc-type">VIDEO</div>
+                                    </div>
+                                    <a th:href="${course.purchasedVideoUrl}" target="_blank" class="doc-download">
+                                        <i class="bi bi-play-circle me-1"></i>Xem/Tải
+                                    </a>
+                                </div>
+
+                                <!-- Empty message if no global docs -->
+                                <div class="no-doc"
+                                    th:if="${#strings.isEmpty(course.purchasedDocUrl) and #strings.isEmpty(course.purchasedPptUrl) and #strings.isEmpty(course.purchasedVideoUrl)}">
+                                    <i class="bi bi-info-circle fs-5 d-block mb-1"></i>
+                                    Khóa học chưa có tài liệu chung đính kèm
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /content-body -->
+        </main>
+    </div><!-- /learn-layout -->
+
+    <!-- Toast -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        /* ────────────────────────────────────────
+           CONSTANTS & STATE
+        ──────────────────────────────────────── */
+        const courseId = /*[[${course.id}]]*/ 0;
+        const courseData = /*[[${course.chapters}]]*/ [];
+        const progressMap = /*[[${lessonCompletedMap}]]*/ {};
+        const initialLessonId = /*[[${initialLessonId}]]*/ null;
+
+        let currentLessonId = null;
+        let currentLessonTitle = null;
+        let currentLessonVideo = null;
+        let currentChapterId = null;
+        let currentChapterTitle = null;
+
+        /* ────────────────────────────────────────
+           INITIALIZE
+        ──────────────────────────────────────── */
+        // Auto-open requested lesson or first lesson
+        document.addEventListener('DOMContentLoaded', function () {
+            let targetLessonId = initialLessonId;
+
+            if (targetLessonId) {
+                loadLesson(parseInt(targetLessonId));
+            } else {
+                const firstLesson = document.querySelector('.lesson-item[data-lesson-id]');
+                if (firstLesson) {
+                    loadLesson(parseInt(firstLesson.dataset.lessonId));
+                }
+            }
+        });
+
+        /* ────────────────────────────────────────
+           LOAD LESSON
+        ──────────────────────────────────────── */
+        function loadLesson(lessonId) {
+            // Find lesson data from DOM
+            let lessonEl = document.querySelector(`.lesson-item[data-lesson-id="${lessonId}"]`);
+
+            // Fallback: If requested ID not found or not provided, load the first available lesson
+            if (!lessonEl) {
+                lessonEl = document.querySelector('.lesson-item[data-lesson-id]');
+                if (lessonEl) {
+                    lessonId = parseInt(lessonEl.dataset.lessonId);
+                    console.log("Lesson ID " + lessonId + " not found, falling back to first lesson: " + lessonId);
+                }
+            }
+
+            if (!lessonEl) {
+                console.error("No lessons found in this course.");
+                return;
+            }
+
+            const lessonTitle = lessonEl.dataset.lessonTitle;
+            const lessonVideo = lessonEl.dataset.lessonVideo || '';
+            const chapterTitle = lessonEl.dataset.chapterTitle || '';
+
+            // Find chapter data for fallback video
+            const chapterEl = lessonEl.closest('.chapter-item');
+            let chapterVideo = '';
+            if (chapterEl) {
+                currentChapterId = parseInt(chapterEl.dataset.chapterId || 0);
+                chapterVideo = chapterEl.dataset.chapterVideo || '';
+                currentChapterTitle = chapterTitle;
+            }
+
+            currentLessonId = lessonId;
+            currentLessonTitle = lessonTitle;
+            currentLessonVideo = lessonVideo;
+
+            // Update active state in sidebar
+            document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
+            lessonEl.classList.add('active');
+
+            // Ensure parent chapter is open + lesson list is visible
+            if (chapterEl) {
+                chapterEl.classList.add('open');
+                const list = chapterEl.querySelector('.lesson-list');
+                if (list) list.classList.remove('collapsed');
+            }
+
+            // Update lesson info
+            document.getElementById('currentChapterLabel').textContent = 'Chương: ' + chapterTitle;
+            document.getElementById('currentLessonTitle').textContent = lessonTitle;
+
+            // Update mark buttons
+            const isCompleted = progressMap[lessonId] === true;
+            document.getElementById('markActions').style.display = 'flex';
+            document.getElementById('btnMarkDone').style.display = isCompleted ? 'none' : 'flex';
+            document.getElementById('btnMarkUndo').style.display = isCompleted ? 'flex' : 'none';
+
+            // Load chapter docs (PowerPoint)
+            loadChapterDocs();
+
+            // Load video with chapter fallback
+            loadVideo(lessonVideo, chapterVideo);
+
+            // Default to video tab
+            switchTab('video');
+        }
+
+        /* ────────────────────────────────────────
+           VIDEO PLAYER
+        ──────────────────────────────────────── */
+        function loadVideo(videoUrl, fallbackUrl) {
+            const container = document.getElementById('videoContainer');
+            const placeholder = document.getElementById('videoPlaceholder');
+            const noVideoMsg = document.getElementById('noVideoMsg');
+
+            // Luôn ẩn placeholder và container trước
+            placeholder.style.display = 'none';
+            container.style.display = 'none';
+            if (noVideoMsg) noVideoMsg.style.display = 'none';
+
+            // Nếu chưa chọn bài → hiện placeholder
+            if (!currentLessonId) {
+                placeholder.style.display = 'flex';
+                return;
+            }
+
+            // Nếu không có video URL → hiện thông báo
+            if (!videoUrl || videoUrl.trim() === '') {
+                placeholder.style.display = 'none';
+                if (noVideoMsg) {
+                    noVideoMsg.style.display = 'block';
+                    noVideoMsg.querySelector('p').innerText = 'Bài học này chưa có video bài giảng';
+                }
+                return;
+            }
+
+            // Detect if it's a DOCUMENT instead of a video (Better detection)
+            const normalizedUrl = videoUrl.toLowerCase();
+            const isDoc = normalizedUrl.includes('.doc') ||
+                normalizedUrl.includes('.docx') ||
+                normalizedUrl.includes('.pdf') ||
+                normalizedUrl.includes('.pptx') ||
+                normalizedUrl.includes('/uploads/lessons/') ||
+                normalizedUrl.includes('/uploads/docs/');
+
+            if (isDoc) {
+                // Render lesson doc in doc tab
+                renderLessonDoc(videoUrl);
+                // Fallback to chapter video for the player
+                videoUrl = fallbackUrl;
+            } else {
+                // Hide any previous lesson's doc
+                const lessonDocWrap = document.getElementById('lessonDocWrapper');
+                if (lessonDocWrap) lessonDocWrap.style.display = 'none';
+                
+                // If no lesson video, try chapter video
+                if (!videoUrl || videoUrl.trim() === '') {
+                    videoUrl = fallbackUrl;
+                }
+            }
+            
+            // Hide everything first
+            placeholder.style.display = 'none';
+            container.style.display = 'none';
+            if (noVideoMsg) noVideoMsg.style.display = 'none';
+
+            // If no video to play at all
+            if (!videoUrl || videoUrl.trim() === '') {
+                if (noVideoMsg) {
+                    noVideoMsg.style.display = 'block';
+                    if (isDoc) {
+                        noVideoMsg.querySelector('p').innerHTML =
+                            'Bài học này là <b>Tài liệu nội dung</b>.<br>Vui lòng xem và tải tại tab <b>"Tài liệu"</b> bên dưới.';
+                        noVideoMsg.querySelector('i').className = 'bi bi-file-earmark-text fs-1 d-block mb-3 text-success';
+                    } else {
+                        noVideoMsg.querySelector('i').className = 'bi bi-camera-video-off fs-1 d-block mb-3 text-muted';
+                        noVideoMsg.querySelector('p').innerText = 'Bài học này chưa có video bài giảng';
+                    }
+                }
+                return;
+            }
+
+            // Normal video logic starts here (resetting icons)
+            if (noVideoMsg) {
+                noVideoMsg.querySelector('i').className = 'bi bi-play-circle fs-1 d-block mb-3 text-muted';
+            }
+
+            // Detect video type và render player
+            const isYoutube = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be');
+            const isVimeo = videoUrl.includes('vimeo.com');
+
+            if (isYoutube) {
+                const videoId = extractYouTubeId(videoUrl);
+                if (videoId) {
+                    container.innerHTML =
+                        '<iframe ' +
+                        'src="https://www.youtube.com/embed/' + videoId + '?rel=0&modestbranding=1" ' +
+                        'frameborder="0" allow="accelerometer; autoplay; clipboard-write; ' +
+                        'encrypted-media; gyroscope; picture-in-picture" ' +
+                        'allowfullscreen ' +
+                        'style="width:100%;height:100%;position:absolute;inset:0;border:none;">' +
+                        '</iframe>';
+                    container.style.display = 'block';
+                } else {
+                    if (noVideoMsg) noVideoMsg.style.display = 'block';
+                }
+            } else if (isVimeo) {
+                const videoId = extractVimeoId(videoUrl);
+                if (videoId) {
+                    container.innerHTML =
+                        '<iframe ' +
+                        'src="https://player.vimeo.com/video/' + videoId + '" ' +
+                        'frameborder="0" allow="autoplay; fullscreen; picture-in-picture" ' +
+                        'allowfullscreen ' +
+                        'style="width:100%;height:100%;position:absolute;inset:0;border:none;">' +
+                        '</iframe>';
+                    container.style.display = 'block';
+                } else {
+                    if (noVideoMsg) noVideoMsg.style.display = 'block';
+                }
+            } else {
+                // Direct video file hoặc embed URL
+                container.innerHTML =
+                    '<video controls style="width:100%;height:100%;position:absolute;inset:0;">' +
+                    '<source src="' + videoUrl + '" type="video/mp4">' +
+                    'Trình duyệt không hỗ trợ video.' +
+                    '</video>';
+                container.style.display = 'block';
+            }
+        }
+
+        function extractYouTubeId(url) {
+            const patterns = [
+                /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+                /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/
+            ];
+            for (const p of patterns) {
+                const m = url.match(p);
+                if (m) return m[1];
+            }
+            return null;
+        }
+
+        function extractVimeoId(url) {
+            const m = url.match(/vimeo\.com\/(\d+)/);
+            return m ? m[1] : null;
+        }
+
+        /* ────────────────────────────────────────
+           CHAPTER DOCS (Toggling Approach)
+         ──────────────────────────────────────── */
+
+        function renderLessonDoc(url) {
+            const wrapper = document.getElementById('lessonDocWrapper');
+            const content = document.getElementById('lessonDocContent');
+            const titleSpan = document.getElementById('currentLessonTitleDoc');
+
+            if (url && url.trim() !== '') {
+                titleSpan.innerText = currentLessonTitle || 'Tài liệu bài học';
+                const type = url.toLowerCase().endsWith('.pdf') ? 'PDF' : 'DOC';
+                const iconClass = type === 'PDF' ? 'pdf bi bi-file-earmark-pdf-fill' : 'bi bi-file-earmark-word-fill text-primary';
+
+                content.innerHTML = `
+            <div class="doc-item">
+                <i class="doc-icon ${iconClass}"></i>
+                <div class="doc-info">
+                    <div class="doc-name">Tài liệu đính kèm bài học</div>
+                    <div class="doc-type">${type}</div>
+                </div>
+                <a href="${url}" target="_blank" class="doc-download">
+                    <i class="bi bi-download me-1"></i>Tải về
+                </a>
             </div>
-
-        </div><!-- /content-body -->
-    </main>
-</div><!-- /learn-layout -->
-
-<!-- Toast -->
-<div class="toast-container" id="toastContainer"></div>
-
-<!-- JavaScript -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script th:inline="javascript">
-/* ────────────────────────────────────────
-   CONSTANTS & STATE
-──────────────────────────────────────── */
-const courseId = [[${course.id}]];
-const courseData = /*[[${course.chapters}]]*/ [];
-const progressMap = /*[[${lessonCompletedMap}]]*/ {};
-
-let currentLessonId = null;
-let currentLessonVideo = null;
-let currentChapterId = null;
-let currentChapterTitle = null;
-
-/* ────────────────────────────────────────
-   INITIALIZE
-──────────────────────────────────────── */
-// Auto-open first lesson if any
-document.addEventListener('DOMContentLoaded', function() {
-    const firstLesson = document.querySelector('.lesson-item[data-lesson-id]');
-    if (firstLesson) {
-        loadLesson(parseInt(firstLesson.dataset.lessonId));
-    }
-});
-
-/* ────────────────────────────────────────
-   LOAD LESSON
-──────────────────────────────────────── */
-function loadLesson(lessonId) {
-    // Find lesson data from DOM attributes
-    const lessonEl = document.querySelector(`.lesson-item[data-lesson-id="${lessonId}"]`);
-    if (!lessonEl) return;
-
-    const lessonTitle = lessonEl.dataset.lessonTitle;
-    const lessonVideo = lessonEl.dataset.lessonVideo || '';
-    const chapterTitle = lessonEl.dataset.chapterTitle || '';
-
-    currentLessonId = lessonId;
-    currentLessonVideo = lessonVideo;
-
-    // Find chapter
-    const chapterEl = lessonEl.closest('.chapter-item');
-    if (chapterEl) {
-        currentChapterId = parseInt(chapterEl.dataset.chapterId || 0);
-        currentChapterTitle = chapterTitle;
-    }
-
-    // Update active state in sidebar
-    document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
-    lessonEl.classList.add('active');
-
-    // Ensure parent chapter is open + lesson list is visible
-    if (chapterEl) {
-        chapterEl.classList.add('open');
-        const list = chapterEl.querySelector('.lesson-list');
-        if (list) list.classList.remove('collapsed');
-    }
-
-    // Update lesson info
-    document.getElementById('currentChapterLabel').textContent = 'Chương: ' + chapterTitle;
-    document.getElementById('currentLessonTitle').textContent = lessonTitle;
-
-    // Update mark buttons
-    const isCompleted = progressMap[lessonId] === true;
-    document.getElementById('markActions').style.display = 'flex';
-    document.getElementById('btnMarkDone').style.display = isCompleted ? 'none' : 'flex';
-    document.getElementById('btnMarkUndo').style.display = isCompleted ? 'flex' : 'none';
-
-    // Load video
-    loadVideo(lessonVideo);
-
-    // Load chapter docs
-    loadChapterDocs();
-
-    // Switch to video tab
-    switchTab('video');
-}
-
-/* ────────────────────────────────────────
-   VIDEO PLAYER
-──────────────────────────────────────── */
-function loadVideo(videoUrl) {
-    const container = document.getElementById('videoContainer');
-    const placeholder = document.getElementById('videoPlaceholder');
-    const noVideoMsg = document.getElementById('noVideoMsg');
-
-    // Luôn ẩn placeholder và container trước
-    placeholder.style.display = 'none';
-    container.style.display = 'none';
-    if (noVideoMsg) noVideoMsg.style.display = 'none';
-
-    // Nếu chưa chọn bài → hiện placeholder
-    if (!currentLessonId) {
-        placeholder.style.display = 'flex';
-        return;
-    }
-
-    // Nếu không có video URL → hiện thông báo
-    if (!videoUrl || videoUrl.trim() === '') {
-        if (noVideoMsg) {
-            noVideoMsg.style.display = 'block';
-        }
-        return;
-    }
-
-    // Ẩn placeholder
-    placeholder.style.display = 'none';
-
-    // Detect video type và render player
-    const isYoutube = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be');
-    const isVimeo = videoUrl.includes('vimeo.com');
-
-    if (isYoutube) {
-        const videoId = extractYouTubeId(videoUrl);
-        if (videoId) {
-            container.innerHTML =
-                '<iframe ' +
-                'src="https://www.youtube.com/embed/' + videoId + '?rel=0&modestbranding=1" ' +
-                'frameborder="0" allow="accelerometer; autoplay; clipboard-write; ' +
-                'encrypted-media; gyroscope; picture-in-picture" ' +
-                'allowfullscreen ' +
-                'style="width:100%;height:100%;position:absolute;inset:0;border:none;">' +
-                '</iframe>';
-            container.style.display = 'block';
-        } else {
-            if (noVideoMsg) noVideoMsg.style.display = 'block';
-        }
-    } else if (isVimeo) {
-        const videoId = extractVimeoId(videoUrl);
-        if (videoId) {
-            container.innerHTML =
-                '<iframe ' +
-                'src="https://player.vimeo.com/video/' + videoId + '" ' +
-                'frameborder="0" allow="autoplay; fullscreen; picture-in-picture" ' +
-                'allowfullscreen ' +
-                'style="width:100%;height:100%;position:absolute;inset:0;border:none;">' +
-                '</iframe>';
-            container.style.display = 'block';
-        } else {
-            if (noVideoMsg) noVideoMsg.style.display = 'block';
-        }
-    } else {
-        // Direct video file hoặc embed URL
-        container.innerHTML =
-            '<video controls style="width:100%;height:100%;position:absolute;inset:0;">' +
-            '<source src="' + videoUrl + '" type="video/mp4">' +
-            'Trình duyệt không hỗ trợ video.' +
-            '</video>';
-        container.style.display = 'block';
-    }
-}
-
-function extractYouTubeId(url) {
-    const patterns = [
-        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
-        /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/
-    ];
-    for (const p of patterns) {
-        const m = url.match(p);
-        if (m) return m[1];
-    }
-    return null;
-}
-
-function extractVimeoId(url) {
-    const m = url.match(/vimeo\.com\/(\d+)/);
-    return m ? m[1] : null;
-}
-
-/* ────────────────────────────────────────
-   CHAPTER DOCS
-──────────────────────────────────────── */
-function loadChapterDocs() {
-    const header = document.getElementById('chapterDocHeader');
-    const docsDiv = document.getElementById('chapterDocs');
-
-    // Find chapter in courseData (Thymeleaf rendered JS object)
-    const chapters = courseData; // already available
-    const chapter = chapters.find(ch => ch.id === currentChapterId);
-
-    if (!chapter) {
-        header.style.display = 'none';
-        docsDiv.innerHTML = '<div class="no-doc"><i class="bi bi-file-earmark-x fs-4 d-block mb-1"></i>Chương này chưa có tài liệu PPT</div>';
-        return;
-    }
-
-    const pptUrl = chapter.contentPptUrl;
-    if (pptUrl && pptUrl.trim() !== '') {
-        header.style.display = 'block';
-        docsDiv.innerHTML = buildDocItem('PPT', pptUrl, 'Tài liệu chương ' + currentChapterTitle);
-    } else {
-        header.style.display = 'none';
-        docsDiv.innerHTML = '<div class="no-doc"><i class="bi bi-file-earmark-x fs-4 d-block mb-1"></i>Chương này chưa có tài liệu PPT</div>';
-    }
-
-    // Course-level docs
-    const courseDocUrl = /*[[${course.purchasedDocUrl} ?: '']]*/ '';
-    const courseHeader = document.getElementById('courseDocHeader');
-    const courseDocsDiv = document.getElementById('courseDocs');
-
-    if (courseDocUrl && courseDocUrl.trim() !== '') {
-        courseHeader.style.display = 'block';
-        const docType = courseDocUrl.toLowerCase().includes('.pdf') ? 'PDF' : 'DOC';
-        courseDocsDiv.innerHTML = buildDocItem(docType, courseDocUrl, 'Giáo trình khóa học');
-    } else {
-        courseHeader.style.display = 'none';
-        courseDocsDiv.innerHTML = '<div class="no-doc"><i class="bi bi-file-earmark-x fs-4 d-block mb-1"></i>Khóa học chưa có tài liệu đính kèm</div>';
-    }
-}
-
-function buildDocItem(type, url, label) {
-    const iconClass = type === 'PDF' ? 'pdf bi bi-file-earmark-pdf-fill'
-                   : type === 'PPT' ? 'ppt bi bi-file-earmark-ppt-fill'
-                   : 'default bi bi-file-earmark-fill';
-    return '<div class="doc-item">' +
-        '<i class="doc-icon ' + iconClass + '"></i>' +
-        '<div class="doc-info">' +
-            '<div class="doc-name">' + label + '</div>' +
-            '<div class="doc-type">' + type + '</div>' +
-        '</div>' +
-        '<a href="' + url + '" target="_blank" class="doc-download">' +
-            '<i class="bi bi-download me-1"></i>Tải về' +
-        '</a>' +
-    '</div>';
-}
-
-/* ────────────────────────────────────────
-   PROGRESS API
-──────────────────────────────────────── */
-async function markComplete() {
-    if (!currentLessonId) return;
-    try {
-        const resp = await fetch('/api/progress/mark?lessonId=' + currentLessonId + '&courseId=' + courseId, {
-            method: 'POST'
-        });
-        if (resp.ok) {
-            const data = await resp.json();
-            updateProgress(data);
-            showToast('success', 'Đã đánh dấu hoàn thành!');
-        } else {
-            const err = await resp.json();
-            showToast('error', err.error || 'Có lỗi xảy ra');
-        }
-    } catch(e) {
-        showToast('error', 'Không thể kết nối server');
-    }
-}
-
-async function markIncomplete() {
-    if (!currentLessonId) return;
-    try {
-        const resp = await fetch('/api/progress/' + courseId + '/' + currentLessonId, {
-            method: 'DELETE'
-        });
-        if (resp.ok) {
-            const data = await resp.json();
-            updateProgress(data);
-            showToast('success', 'Đã bỏ đánh dấu');
-        } else {
-            showToast('error', 'Có lỗi xảy ra');
-        }
-    } catch(e) {
-        showToast('error', 'Không thể kết nối server');
-    }
-}
-
-function updateProgress(progressData) {
-    // Update progressMap
-    progressMap[currentLessonId] = true; // or from response
-
-    // Update sidebar icons
-    const lessonEl = document.querySelector(`.lesson-item[data-lesson-id="${currentLessonId}"]`);
-    if (lessonEl) {
-        const iconEl = lessonEl.querySelector('.lesson-status-icon');
-        if (iconEl) {
-            iconEl.className = 'lesson-status-icon completed';
-            iconEl.innerHTML = '<i class="bi bi-check-circle-fill"></i>';
-        }
-    }
-
-    // Update buttons
-    document.getElementById('btnMarkDone').style.display = 'none';
-    document.getElementById('btnMarkUndo').style.display = 'flex';
-
-    // Update sidebar progress bar
-    if (progressData) {
-        const percent = progressData.percentComplete || 0;
-        const completed = progressData.completedLessons || 0;
-        const total = progressData.totalLessons || 0;
-
-        const trackEl = document.querySelector('.progress-track');
-        if (trackEl) {
-            trackEl.innerHTML =
-                '<span class="fw-bold" style="color: var(--primary);">' +
-                    completed + ' / ' + total + ' bài' +
-                '</span>' +
-                '<span style="float:right;">' + Math.round(percent) + '%</span>';
+        `;
+                wrapper.style.display = 'block';
+            } else {
+                wrapper.style.display = 'none';
+            }
         }
 
-        const fillEl = document.querySelector('.progress-bar-fill');
-        if (fillEl) {
-            fillEl.style.width = percent + '%';
+        function loadChapterDocs() {
+            // Hide lesson doc specifically if we are switching lessons (default hide)
+            // It will be re-shown by renderLessonDoc if needed
+            document.getElementById('lessonDocWrapper').style.display = 'none';
+            // Hide all chapter doc wrappers
+            document.querySelectorAll('.chapter-doc-wrapper').forEach(el => {
+                el.style.display = 'none';
+            });
+
+            // Show only the active one
+            if (currentChapterId) {
+                const activeWrapper = document.getElementById('chapter-doc-' + currentChapterId);
+                if (activeWrapper) {
+                    activeWrapper.style.display = 'block';
+                }
+            }
         }
-    }
-}
 
-/* ────────────────────────────────────────
-   TABS
-──────────────────────────────────────── */
-function switchTab(tab) {
-    document.getElementById('tabVideo').classList.toggle('active', tab === 'video');
-    document.getElementById('tabDoc').classList.toggle('active', tab === 'doc');
-    document.getElementById('panelVideo').classList.toggle('active', tab === 'video');
-    document.getElementById('panelDoc').classList.toggle('active', tab === 'doc');
-}
 
-/* ────────────────────────────────────────
-   CHAPTER ACCORDION
-──────────────────────────────────────── */
-function toggleChapter(header) {
-    const card = header.closest('.chapter-item');
-    if (!card) return;
-    const list = card.querySelector('.lesson-list');
-    const isOpen = card.classList.contains('open');
-    // toggle class trên chapter
-    card.classList.toggle('open', !isOpen);
-    // toggle collapsed class trên lesson list
-    if (list) list.classList.toggle('collapsed', isOpen);
-}
+        /* ────────────────────────────────────────
+           PROGRESS API
+        ──────────────────────────────────────── */
+        async function markComplete() {
+            if (!currentLessonId) return;
+            try {
+                const resp = await fetch('/api/progress/mark?lessonId=' + currentLessonId + '&courseId=' + courseId, {
+                    method: 'POST'
+                });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    updateProgress(data);
+                    showToast('success', 'Đã đánh dấu hoàn thành!');
+                } else {
+                    const err = await resp.json();
+                    showToast('error', err.error || 'Có lỗi xảy ra');
+                }
+            } catch (e) {
+                showToast('error', 'Không thể kết nối server');
+            }
+        }
 
-/* ────────────────────────────────────────
-   MOBILE SIDEBAR
-──────────────────────────────────────── */
-function toggleSidebar() {
-    document.getElementById('learnSidebar').classList.toggle('open');
-    document.getElementById('sidebarOverlay').classList.toggle('open');
-}
+        async function markIncomplete() {
+            if (!currentLessonId) return;
+            try {
+                const resp = await fetch('/api/progress/' + courseId + '/' + currentLessonId, {
+                    method: 'DELETE'
+                });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    updateProgress(data);
+                    showToast('success', 'Đã bỏ đánh dấu');
+                } else {
+                    showToast('error', 'Có lỗi xảy ra');
+                }
+            } catch (e) {
+                showToast('error', 'Không thể kết nối server');
+            }
+        }
 
-/* ────────────────────────────────────────
-   TOAST
-──────────────────────────────────────── */
-function showToast(type, message) {
-    const container = document.getElementById('toastContainer');
-    const iconClass = type === 'success' ? 'bi-check-circle-fill text-success'
-                    : 'bi-x-circle-fill text-danger';
-    const toast = document.createElement('div');
-    toast.className = 'custom-toast ' + type;
-    toast.innerHTML = '<i class="bi ' + iconClass + ' toast-icon"></i>' + message;
-    container.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-}
-</script>
+        function updateProgress(progressData) {
+            // Update progressMap
+            progressMap[currentLessonId] = true; // or from response
+
+            // Update sidebar icons
+            const lessonEl = document.querySelector(`.lesson-item[data-lesson-id="${currentLessonId}"]`);
+            if (lessonEl) {
+                const iconEl = lessonEl.querySelector('.lesson-status-icon');
+                if (iconEl) {
+                    iconEl.className = 'lesson-status-icon completed';
+                    iconEl.innerHTML = '<i class="bi bi-check-circle-fill"></i>';
+                }
+            }
+
+            // Update buttons
+            document.getElementById('btnMarkDone').style.display = 'none';
+            document.getElementById('btnMarkUndo').style.display = 'flex';
+
+            // Update sidebar progress bar
+            if (progressData) {
+                const percent = progressData.percentComplete || 0;
+                const completed = progressData.completedLessons || 0;
+                const total = progressData.totalLessons || 0;
+
+                const trackEl = document.querySelector('.progress-track');
+                if (trackEl) {
+                    trackEl.innerHTML =
+                        '<span class="fw-bold" style="color: var(--primary);">' +
+                        completed + ' / ' + total + ' bài' +
+                        '</span>' +
+                        '<span style="float:right;">' + Math.round(percent) + '%</span>';
+                }
+
+                const fillEl = document.querySelector('.progress-bar-fill');
+                if (fillEl) {
+                    fillEl.style.width = percent + '%';
+                }
+            }
+        }
+
+        /* ────────────────────────────────────────
+           TABS
+        ──────────────────────────────────────── */
+        function switchTab(tab) {
+            document.getElementById('tabVideo').classList.toggle('active', tab === 'video');
+            document.getElementById('tabDoc').classList.toggle('active', tab === 'doc');
+            document.getElementById('panelVideo').classList.toggle('active', tab === 'video');
+            document.getElementById('panelDoc').classList.toggle('active', tab === 'doc');
+        }
+
+        /* ────────────────────────────────────────
+           CHAPTER ACCORDION
+        ──────────────────────────────────────── */
+        function toggleChapter(header) {
+            const card = header.closest('.chapter-item');
+            if (!card) return;
+            const list = card.querySelector('.lesson-list');
+            const isOpen = card.classList.contains('open');
+            // toggle class trên chapter
+            card.classList.toggle('open', !isOpen);
+            // toggle collapsed class trên lesson list
+            if (list) list.classList.toggle('collapsed', isOpen);
+        }
+
+        /* ────────────────────────────────────────
+           MOBILE SIDEBAR
+        ──────────────────────────────────────── */
+        function toggleSidebar() {
+            document.getElementById('learnSidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('open');
+        }
+
+        /* ────────────────────────────────────────
+           TOAST
+        ──────────────────────────────────────── */
+        function showToast(type, message) {
+            const container = document.getElementById('toastContainer');
+            const iconClass = type === 'success' ? 'bi-check-circle-fill text-success'
+                : 'bi-x-circle-fill text-danger';
+            const toast = document.createElement('div');
+            toast.className = 'custom-toast ' + type;
+            toast.innerHTML = '<i class="bi ' + iconClass + ' toast-icon"></i>' + message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
 </body>
+
 </html>

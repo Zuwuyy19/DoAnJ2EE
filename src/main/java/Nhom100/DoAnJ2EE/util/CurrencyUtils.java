@@ -14,7 +14,7 @@ public class CurrencyUtils {
      */
     public static String formatVnd(double amount) {
         NumberFormat nf = NumberFormat.getNumberInstance(Locale.GERMANY);
-        return nf.format(amount) + " ₫";
+        return nf.format(amount) + " VNĐ";
     }
 
     /**

@@ -46,6 +46,18 @@ public class Course {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private List<Chapter> chapters;
 
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CourseReview> reviews;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CourseProgress> progress;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> cartItems;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderDetail> orderDetails;
+
     public Course() {}
 
     public Course(Long id, String name, String title, String description, String image, Double price) {

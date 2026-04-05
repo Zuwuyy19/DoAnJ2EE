@@ -15,7 +15,8 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
     boolean existsByOrderUserIdAndCourseId(Long userId, Long courseId);
 
     @Query("SELECT CASE WHEN COUNT(od) > 0 THEN true ELSE false END FROM OrderDetail od " +
-           "WHERE od.order.user.id = :userId AND od.course.id = :courseId AND od.order.status = 'COMPLETED'")
+           "WHERE od.order.user.id = :userId AND od.course.id = :courseId " +
+           "AND (od.order.status = 'COMPLETED' OR od.order.status = 'PAID')")
     boolean existsCompletedOrderByUserAndCourse(@Param("userId") Long userId, @Param("courseId") Long courseId);
 
     @Modifying

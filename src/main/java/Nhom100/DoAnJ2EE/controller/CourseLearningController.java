@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Map;
@@ -63,7 +64,9 @@ public class CourseLearningController extends BaseController {
      * Kiểm tra quyền: user đã mua khóa học hoặc là admin.
      */
     @GetMapping("/learn/{courseId}")
-    public String learningPage(@PathVariable Long courseId, Model model,
+    public String learningPage(@PathVariable Long courseId,
+            @RequestParam(required = false) Long lessonId,
+            Model model,
             RedirectAttributes redirectAttributes) {
 
         // Bước 1: Lấy user hiện tại
@@ -118,6 +121,7 @@ public class CourseLearningController extends BaseController {
         model.addAttribute("totalLessons", totalLessons);
         model.addAttribute("completedLessons", completedLessons);
         model.addAttribute("percentComplete", percentComplete);
+        model.addAttribute("initialLessonId", lessonId);
 
         return "learn/index";
     }

@@ -1,0 +1,106 @@
+<footer th:fragment="footer" xmlns:th="http://www.thymeleaf.org">
+    <div class="container">
+        <div class="row gy-5 text-start">
+            <div class="col-lg-4 col-md-12">
+                <div class="footer-brand" style="color: white; font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <span>🎓</span> OnlineCourse
+                </div>
+                <p class="mb-4" style="line-height:1.7; color: #94a3b8;">Chúng tôi cung cấp lộ trình học tập tối ưu, giúp bạn làm chủ công nghệ và phát triển sự nghiệp trong kỷ nguyên số.</p>
+                <div>
+                    <a href="#" class="social-btn"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="social-btn"><i class="bi bi-youtube"></i></a>
+                    <a href="#" class="social-btn"><i class="bi bi-linkedin"></i></a>
+                    <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6">
+                <h6 class="text-white fw-bold mb-4" style="font-size:0.9rem;">Về chúng tôi</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#" class="footer-link">Giới thiệu</a></li>
+                    <li class="mb-2"><a href="#" class="footer-link">Liên hệ</a></li>
+                    <li class="mb-2"><a href="#" class="footer-link">Điều khoản</a></li>
+                    <li class="mb-2"><a href="#" class="footer-link">Bảo mật</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6">
+                <h6 class="text-white fw-bold mb-4" style="font-size:0.9rem;">Học tập</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="/courses" class="footer-link">Tất cả khóa học</a></li>
+                    <li class="mb-2"><a href="#" class="footer-link">Lộ trình học</a></li>
+                    <li class="mb-2"><a href="#" class="footer-link">Chứng chỉ</a></li>
+                    <li class="mb-2"><a href="#" class="footer-link">Hỏi đáp</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-4 col-md-4 col-12">
+                <h6 class="text-white fw-bold mb-4" style="font-size:0.9rem;">Đăng ký nhận tin</h6>
+                <p class="small mb-4" style="line-height:1.6; color: #94a3b8;">Nhận thông tin về các khóa học mới nhất và mã giảm giá hấp dẫn.</p>
+                <div class="d-flex gap-2">
+                    <input type="email" class="newsletter-input flex-grow-1" placeholder="Email của bạn">
+                    <button class="btn btn-newsletter" type="button">Gửi</button>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom text-center" style="border-top: 1px solid rgba(255,255,255,0.06); margin-top: 50px; padding-top: 24px;">
+            <p class="mb-0 small" style="opacity:0.5; color: #94a3b8;">© 2026 OnlineCourse. Tất cả quyền được bảo lưu. Thiết kế bởi Antigravity.</p>
+        </div>
+    </div>
+
+    <style>
+        footer {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 80px 0 30px;
+            margin-top: 80px;
+        }
+        .footer-link {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-block;
+            padding: 2px 0;
+        }
+        .footer-link:hover { color: white; transform: translateX(4px); }
+        .social-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.06);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .social-btn:hover {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            transform: translateY(-4px) scale(1.1);
+            border-color: transparent;
+            box-shadow: 0 8px 20px rgba(99,102,241,0.3);
+        }
+        .newsletter-input {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50px;
+            padding: 10px 20px;
+            color: white;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        .newsletter-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            background: rgba(255,255,255,0.1);
+        }
+        .btn-newsletter {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border: none;
+            border-radius: 50px;
+            padding: 10px 24px;
+            font-weight: 700;
+            color: white;
+            transition: all 0.3s ease;
+        }
+    </style>
+</footer>

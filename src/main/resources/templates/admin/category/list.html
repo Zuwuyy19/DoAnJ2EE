@@ -18,9 +18,9 @@
 
 <div th:replace="~{fragments/admin_navbar :: admin_navbar(activePage='categories')}"></div>
 
-<div class="container mt-4">
+<div class="container-fluid px-lg-5 mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-9">
+        <div class="col-lg-11 col-xl-10">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h2 class="fw-bold text-dark mb-1">Quản lý Danh mục</h2>
@@ -29,6 +29,18 @@
                 <a href="/admin/categories/new" class="btn btn-primary btn-pill px-4 shadow-sm">
                     <i class="bi bi-plus-lg me-2"></i>Thêm Danh mục
                 </a>
+            </div>
+
+            <!-- Alert Messages -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
 
             <div class="card shadow-sm border-0">
@@ -63,7 +75,7 @@
                                         <i class="bi bi-pencil-square me-1"></i>Sửa
                                     </a>
                                     <a th:href="@{'/admin/categories/delete/' + ${cat.id}}" class="btn btn-sm btn-outline-danger btn-pill px-3" 
-                                       onclick="return confirm('Bạn có chắc chắn muốn xóa? Thao tác này có thể ảnh hưởng đến các khóa học thuộc danh mục này.')">
+                                       onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục này? Các khóa học trong danh mục sẽ KHÔNG bị xóa mà chỉ trở về trạng thái chưa phân loại.')">
                                         <i class="bi bi-trash me-1"></i>Xóa
                                     </a>
                                 </td>

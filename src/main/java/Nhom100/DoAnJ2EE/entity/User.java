@@ -3,6 +3,7 @@ package Nhom100.DoAnJ2EE.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -28,6 +29,18 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> orders;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CourseReview> reviews;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CourseProgress> progress;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Cart cart;
 
     private boolean enabled = true; // Thêm trường cho phép/khóa tài khoản
 }
