@@ -18,76 +18,106 @@
 
 <div th:replace="~{fragments/admin_navbar :: admin_navbar(activePage='users')}"></div>
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold mb-1 text-dark">Quản lý Người dùng</h2>
-            <p class="text-muted mb-0">Xem và quản lý quyền hạn của các thành viên</p>
-        </div>
-    </div>
+<div class="container-fluid px-lg-5 mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-11 col-xl-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1 text-dark">Quản lý Người dùng</h2>
+                    <p class="text-muted mb-0">Xem và quản lý quyền hạn của các thành viên</p>
+                </div>
+            </div>
 
-    <div class="card shadow-sm border-0 overflow-hidden">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light text-secondary">
-                        <tr>
-                            <th class="ps-4 py-3">ID</th>
-                            <th class="py-3">Email</th>
-                            <th class="py-3">Quyền hạn</th>
-                            <th class="py-3">Trạng thái</th>
-                            <th class="text-end pe-4 py-3">Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="user : ${users}">
-                            <td class="ps-4">
-                                <span class="fw-medium text-secondary" th:text="'#' + ${user.id}"></span>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 40px; height: 40px;">
-                                        <span th:text="${#strings.substring(user.email,0,1).toUpperCase()}">U</span>
-                                    </div>
-                                    <span class="fw-semibold text-dark" th:text="${user.email}">user@example.com</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="d-flex gap-1 flex-wrap">
-                                    <span th:each="role : ${user.roles}" 
-                                          th:text="${role.name}"
-                                          class="badge-role"
-                                          th:classappend="${role.name == 'ROLE_ADMIN' ? 'bg-role-admin' : 'bg-role-user'}">
-                                    </span>
-                                </div>
-                            </td>
-                            <td>
-                                <span th:if="${user.enabled}" class="badge bg-success rounded-pill px-3 py-2 small">Hoạt động</span>
-                                <span th:if="${!user.enabled}" class="badge bg-danger rounded-pill px-3 py-2 small">Đã khóa</span>
-                            </td>
-                            <td class="text-end pe-4">
-                                <div class="btn-group">
-                                    <a th:href="@{'/admin/users/edit/' + ${user.id}}" class="btn btn-sm btn-outline-primary rounded-pill px-3 me-2">
-                                        <i class="bi bi-pencil-square me-1"></i>Sửa
-                                    </a>
-                                    <form th:if="${user.enabled}" th:action="@{'/admin/users/' + ${user.id} + '/toggle'}" method="post">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="return confirm('Bạn có chắc chắn muốn KHÓA tài khoản này?')">
-                                            <i class="bi bi-lock me-1"></i>Khóa
-                                        </button>
-                                    </form>
-                                    <form th:if="${!user.enabled}" th:action="@{'/admin/users/' + ${user.id} + '/toggle'}" method="post">
-                                        <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3">
-                                            <i class="bi bi-unlock me-1"></i>Mở khóa
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr th:if="${#lists.isEmpty(users)}">
-                            <td colspan="4" class="text-center py-5 text-muted italic">Chưa có người dùng nào được tìm thấy.</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <!-- Alert Messages -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-check-circle-fill fs-4 me-3 text-success"></i>
+                    <div>
+                        <strong class="d-block">Thành công!</strong>
+                        <span th:text="${successMessage}"></span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-exclamation-octagon-fill fs-4 me-3 text-danger"></i>
+                    <div>
+                        <strong class="d-block">Lỗi hệ thống!</strong>
+                        <span th:text="${errorMessage}"></span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div class="card shadow-sm border-0 overflow-hidden">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light text-secondary">
+                                <tr>
+                                    <th class="ps-4 py-3" style="width: 80px;">ID</th>
+                                    <th class="py-3">Email</th>
+                                    <th class="py-3 text-center">Quyền hạn</th>
+                                    <th class="py-3 text-center">Trạng thái</th>
+                                    <th class="text-end pe-4 py-3">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="user : ${users}">
+                                    <td class="ps-4">
+                                        <span class="fw-medium text-secondary" th:text="'#' + ${user.id}"></span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 40px; height: 40px;">
+                                                <span th:text="${#strings.substring(user.email,0,1).toUpperCase()}">U</span>
+                                            </div>
+                                            <span class="fw-semibold text-dark" th:text="${user.email}">user@example.com</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex gap-1 flex-wrap justify-content-center">
+                                            <span th:each="role : ${user.roles}" 
+                                                  th:text="${role.name}"
+                                                  class="badge-role"
+                                                  th:classappend="${role.name == 'ROLE_ADMIN' ? 'bg-role-admin' : 'bg-role-user'}">
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span th:if="${user.enabled}" class="badge bg-success rounded-pill px-3 py-2 small">Hoạt động</span>
+                                        <span th:if="${!user.enabled}" class="badge bg-danger rounded-pill px-3 py-2 small">Đã khóa</span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group">
+                                            <a th:href="@{'/admin/users/edit/' + ${user.id}}" class="btn btn-sm btn-outline-primary rounded-pill px-3 me-2">
+                                                <i class="bi bi-pencil-square me-1"></i>Sửa
+                                            </a>
+                                            <form th:if="${user.enabled}" th:action="@{'/admin/users/' + ${user.id} + '/toggle'}" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-warning rounded-pill px-3 me-2" onclick="return confirm('Bạn có chắc chắn muốn KHÓA tài khoản này?')">
+                                                    <i class="bi bi-lock me-1"></i>Khóa
+                                                </button>
+                                            </form>
+                                            <form th:if="${!user.enabled}" th:action="@{'/admin/users/' + ${user.id} + '/toggle'}" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3 me-2">
+                                                    <i class="bi bi-unlock me-1"></i>Mở khóa
+                                                </button>
+                                            </form>
+                                            <a th:href="@{'/admin/users/delete/' + ${user.id}}" class="btn btn-sm btn-outline-danger shadow-sm py-1 px-2" onclick="return confirm('CẢNH BÁO: Bạn thực sự muốn XÓA VĨNH VIỄN tài khoản này? Mọi dữ liệu mua hàng và học tập sẽ bị xóa hoàn toàn.')">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(users)}">
+                                    <td colspan="5" class="text-center py-5 text-muted italic">Chưa có người dùng nào được tìm thấy.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

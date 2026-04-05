@@ -27,6 +27,21 @@
             border-radius: 20px;
             border: none;
         }
+
+        .filter-bar .input-group-text {
+            border-color: #e2e8f0;
+            color: #64748b;
+        }
+
+        .filter-bar .form-control, .filter-bar .form-select {
+            border-color: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .filter-bar .form-control:focus, .filter-bar .form-select:focus {
+            box-shadow: none;
+            border-color: #3b82f6;
+        }
     </style>
 </head>
 
@@ -84,63 +99,106 @@
         <div class="card content-card shadow-sm mb-5">
             <div class="card-body p-5">
                 <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
-                    <h5 class="card-title fw-bold text-dark mb-0"><i class="bi bi-graph-up-arrow me-2 text-primary"></i>Doanh thu</h5>
-                    <form method="get" action="/admin" class="d-flex flex-wrap align-items-center gap-2">
-                        <select class="form-select form-select-sm" name="period">
-                            <option value="day" th:selected="${period == 'day'}">Theo ngày</option>
-                            <option value="week" th:selected="${period == 'week'}">Theo tuần</option>
-                            <option value="month" th:selected="${period == 'month'}">Theo tháng</option>
-                            <option value="year" th:selected="${period == 'year'}">Theo năm</option>
-                        </select>
-                        <input type="date" class="form-control form-control-sm"
-                               name="startDate" th:value="${startDate}" data-period="range">
-                        <input type="date" class="form-control form-control-sm"
-                               name="endDate" th:value="${endDate}" data-period="range">
-                        <input type="month" class="form-control form-control-sm"
-                               name="monthValue" data-period="month"
-                               th:value="${monthValue}">
-                        <input type="number" class="form-control form-control-sm"
-                               name="yearValue" data-period="year" min="2000" max="2100"
-                               th:value="${yearValue}">
-                        <input type="date" class="form-control form-control-sm"
-                               name="singleDate"
-                               data-period="day"
-                               th:value="${day != null && month != null && year != null ? T(java.time.LocalDate).of(year, month, day) : null}">
-                        <button type="submit" class="btn btn-sm btn-outline-primary">Xem</button>
+                    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-graph-up-arrow me-2 text-primary"></i>Biểu đồ Doanh thu</h5>
+                    <form method="get" action="/admin" class="filter-bar d-flex flex-wrap align-items-center gap-3">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-funnel-fill text-muted"></i></span>
+                            <select class="form-select form-select-sm border-start-0 ps-0 fw-medium" name="period" style="width: 140px; cursor: pointer;">
+                                <option value="day" th:selected="${period == 'day'}">Từng ngày</option>
+                                <option value="week" th:selected="${period == 'week'}">Theo tuần</option>
+                                <option value="month" th:selected="${period == 'month'}">Tháng cụ thể</option>
+                                <option value="year" th:selected="${period == 'year'}">Theo năm</option>
+                            </select>
+                        </div>
+
+                        <!-- Date range for week/custom -->
+                        <div class="input-group input-group-sm" data-period="range">
+                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-calendar-range text-muted"></i></span>
+                            <input type="date" class="form-control form-control-sm border-start-0 border-end-0 ps-0" name="startDate" th:value="${startDate}" title="Ngày bắt đầu">
+                            <span class="input-group-text bg-white border-start-0 border-end-0 text-muted px-1">→</span>
+                            <input type="date" class="form-control form-control-sm border-start-0 ps-0" name="endDate" th:value="${endDate}" title="Ngày kết thúc">
+                        </div>
+
+                        <!-- Specific Month -->
+                        <div class="input-group input-group-sm" data-period="month">
+                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-calendar-event text-muted"></i></span>
+                            <input type="month" class="form-control form-control-sm border-start-0 ps-0" name="monthValue" th:value="${monthValue}">
+                        </div>
+
+                        <!-- Specific Year -->
+                        <div class="input-group input-group-sm" data-period="year">
+                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-calendar-fill text-muted"></i></span>
+                            <input type="number" class="form-control form-control-sm border-start-0 ps-0" name="yearValue" min="2000" max="2100" th:value="${yearValue}" placeholder="Năm">
+                        </div>
+
+                        <!-- Specific Day -->
+                        <div class="input-group input-group-sm" data-period="day">
+                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-calendar-check text-muted"></i></span>
+                            <input type="date" class="form-control form-control-sm border-start-0 ps-0" name="singleDate"
+                                th:value="${day != null && month != null && year != null ? T(java.time.LocalDate).of(year, month, day) : null}">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-sm px-4 rounded-3 shadow-sm border-0">
+                            <i class="bi bi-search me-1"></i>Xem lọc
+                        </button>
                     </form>
                 </div>
-                <canvas id="revenueChart" height="120"></canvas>
+                <div class="p-2 bg-light rounded-4 border border-opacity-10 mb-2">
+                    <canvas id="revenueChart" height="120"></canvas>
+                </div>
             </div>
         </div>
 
         <div class="row g-4 mb-5">
             <div class="col-lg-6">
-                <div class="card content-card shadow-sm h-100">
+                <div class="card content-card shadow-sm h-100 border-0">
                     <div class="card-body p-4">
-                        <h5 class="card-title fw-bold text-dark mb-3"><i class="bi bi-award me-2 text-warning"></i>Top khóa học</h5>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between align-items-center"
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="fw-bold text-dark mb-0"><i class="bi bi-award me-2 text-warning"></i>Top khóa học</h5>
+                            <span class="badge bg-soft-warning text-warning rounded-pill px-3 py-1" style="background-color: #fffbeb">Bán chạy nhất</span>
+                        </div>
+                        <div class="list-group list-group-flush border-top-0">
+                            <div class="list-group-item d-flex justify-content-between align-items-center py-3 border-start-0 border-end-0 px-0"
                                 th:each="item : ${topCourses}">
-                                <span th:text="${item.title}">Course</span>
-                                <span class="badge bg-light text-dark border" th:text="${#numbers.formatDecimal(item.revenue, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</span>
-                            </li>
-                            <li class="list-group-item text-muted" th:if="${#lists.isEmpty(topCourses)}">Chưa có dữ liệu</li>
-                        </ul>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-light rounded-3 p-2 me-3">
+                                        <i class="bi bi-journal-check text-primary"></i>
+                                    </div>
+                                    <span class="fw-medium text-dark" th:text="${item.title}">Course Title</span>
+                                </div>
+                                <span class="badge bg-light text-primary border rounded-pill px-3 py-2 fw-bold" th:text="${@currencyUtils.formatVnd(item.revenue)}">0 VNĐ</span>
+                            </div>
+                            <div class="list-group-item text-center py-5 text-muted border-0" th:if="${#lists.isEmpty(topCourses)}">
+                                <i class="bi bi-inbox fs-2 d-block mb-2 opacity-25"></i>
+                                Chưa có dữ liệu khóa học
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-6">
-                <div class="card content-card shadow-sm h-100">
+                <div class="card content-card shadow-sm h-100 border-0">
                     <div class="card-body p-4">
-                        <h5 class="card-title fw-bold text-dark mb-3"><i class="bi bi-people me-2 text-success"></i>Top người dùng</h5>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between align-items-center"
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="fw-bold text-dark mb-0"><i class="bi bi-people me-2 text-success"></i>Top người dùng</h5>
+                            <span class="badge bg-soft-success text-success rounded-pill px-3 py-1" style="background-color: #f0fdf4">Chi tiêu nhiều nhất</span>
+                        </div>
+                        <div class="list-group list-group-flush border-top-0">
+                            <div class="list-group-item d-flex justify-content-between align-items-center py-3 border-start-0 border-end-0 px-0"
                                 th:each="item : ${topUsers}">
-                                <span th:text="${item.email}">user@email.com</span>
-                                <span class="badge bg-light text-dark border" th:text="${#numbers.formatDecimal(item.revenue, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</span>
-                            </li>
-                            <li class="list-group-item text-muted" th:if="${#lists.isEmpty(topUsers)}">Chưa có dữ liệu</li>
-                        </ul>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-light rounded-3 p-2 me-3">
+                                        <i class="bi bi-person-badge text-success"></i>
+                                    </div>
+                                    <span class="fw-medium text-dark" th:text="${item.email}">user@email.com</span>
+                                </div>
+                                <span class="badge bg-light text-success border rounded-pill px-3 py-2 fw-bold" th:text="${@currencyUtils.formatVnd(item.revenue)}">0 VNĐ</span>
+                            </div>
+                            <div class="list-group-item text-center py-5 text-muted border-0" th:if="${#lists.isEmpty(topUsers)}">
+                                <i class="bi bi-person-x fs-2 d-block mb-2 opacity-25"></i>
+                                Chưa có dữ liệu người dùng
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -183,10 +241,22 @@
 
         function togglePeriodInputs() {
             const value = periodSelect ? periodSelect.value : 'month';
-            rangeInputs.forEach(el => el.style.display = value === 'week' ? '' : 'none');
-            if (monthInput) monthInput.style.display = value === 'month' ? '' : 'none';
-            if (yearInput) yearInput.style.display = value === 'year' ? '' : 'none';
-            if (dayInput) dayInput.style.display = value === 'day' ? '' : 'none';
+            rangeInputs.forEach(el => {
+                el.classList.toggle('d-none', value !== 'week');
+                el.classList.toggle('d-flex', value === 'week');
+            });
+            if (monthInput) {
+                monthInput.classList.toggle('d-none', value !== 'month');
+                monthInput.classList.toggle('d-flex', value === 'month');
+            }
+            if (yearInput) {
+                yearInput.classList.toggle('d-none', value !== 'year');
+                yearInput.classList.toggle('d-flex', value === 'year');
+            }
+            if (dayInput) {
+                dayInput.classList.toggle('d-none', value !== 'day');
+                dayInput.classList.toggle('d-flex', value === 'day');
+            }
         }
         if (periodSelect) {
             togglePeriodInputs();

@@ -6,14 +6,15 @@
     <title th:text="${course.title} + ' | OnlineCourse'">Chi tiết khóa học</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #6366f1;
             --primary-dark: #4f46e5;
             --dark: #1e1b4b;
-            --light: #f8faff;
+            --light: #f1f5f9;
         }
-        body { background: var(--light); font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--light); font-family: 'Inter', sans-serif; color: #1e293b; }
 
         .navbar-brand { font-weight: 800; font-size: 1.4rem; color: var(--primary) !important; }
         .nav-link { font-weight: 500; }
@@ -126,6 +127,19 @@
             padding: 4px 10px;
             border-radius: 999px;
             font-size: 0.75rem;
+        }
+
+        /* ── VNPay Premium Button ── */
+        .btn-vnpay {
+            background: linear-gradient(135deg, #005baa 0%, #0075d1 100%);
+            color: white !important;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .btn-vnpay:hover {
+            background: linear-gradient(135deg, #004a8b 0%, #0064b3 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 91, 170, 0.2);
         }
     </style>
 </head>
@@ -296,7 +310,7 @@
                         <img th:src="${rc.image}" onerror="this.src='https://via.placeholder.com/300x140/6366f1/ffffff?text=Course'">
                         <div class="card-body">
                             <div class="card-title" th:text="${rc.title}">Khóa học liên quan</div>
-                            <div class="card-price" th:text="${#numbers.formatDecimal(rc.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</div>
+                            <div class="card-price" th:text="${@currencyUtils.formatVnd(rc.price)}">0 VNĐ</div>
                         </div>
                     </a>
                 </div>
@@ -317,7 +331,7 @@
                 <!-- USER -->
                 <div class="card border-0 shadow-lg rounded-3 overflow-hidden" th:if="${!isAdmin}">
                     <div class="card-body text-center p-4">
-                        <h1 class="text-danger fw-black mb-3 display-5 fw-bold" th:text="${#numbers.formatDecimal(course.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</h1>
+                        <h1 class="text-danger fw-black mb-3 display-5 fw-bold" th:text="${@currencyUtils.formatVnd(course.price)}">0 VNĐ</h1>
 
                         <!-- Chưa mua -->
                         <div th:if="${!isPurchased}">
@@ -336,8 +350,11 @@
                             <form th:if="${isLogged}" th:action="@{/vnpay/create}" method="POST">
                                 <input type="hidden" name="courseId" th:value="${course.id}">
                                 <button type="submit"
-                                        class="btn btn-outline-primary btn-lg w-100 rounded-pill fw-bold py-2">
-                                    <i class="bi bi-qr-code-scan me-2"></i>Mua ngay (VNPay QR)
+                                        class="btn btn-vnpay btn-lg w-100 rounded-pill fw-bold py-2 shadow-sm border-0 position-relative overflow-hidden">
+                                    <div class="position-relative" style="z-index: 2;">
+                                        <i class="bi bi-qr-code-scan me-2"></i>Mua ngay (VNPay QR)
+                                    </div>
+                                    <div class="bg-shape" style="position: absolute; right: -15px; bottom: -15px; width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%; z-index: 1;"></div>
                                 </button>
                             </form>
                         </div>
@@ -372,7 +389,7 @@
                         <span class="badge bg-warning text-dark px-3 py-2 mb-3 rounded-pill">
                             <i class="bi bi-gear-fill me-1"></i>Chế độ quản trị
                         </span>
-                        <h1 class="text-secondary mb-3 display-5 fw-bold" th:text="${#numbers.formatDecimal(course.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</h1>
+                        <h1 class="text-secondary mb-3 display-5 fw-bold" th:text="${@currencyUtils.formatVnd(course.price)}">0 VNĐ</h1>
                         <a th:href="@{'/admin/courses/edit/' + ${course.id}}"
                            class="btn btn-warning btn-lg w-100 mb-3 fw-bold rounded-pill text-white">
                             <i class="bi bi-pencil-square me-2"></i>Chỉnh sửa khóa học
@@ -392,6 +409,8 @@
 </div><!-- /container -->
 
 <!-- JAVASCRIPT -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function toggleChapter(header) {

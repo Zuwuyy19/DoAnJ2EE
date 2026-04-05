@@ -549,7 +549,7 @@
                     <div class="course-img-wrapper">
                         <img th:src="${course.image}" class="course-img" alt="Course Image"
                              onerror="this.src='https://via.placeholder.com/600x400/6366f1/ffffff?text=Course+Image'">
-                        <div class="price-badge" th:text="${#numbers.formatDecimal(course.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</div>
+                        <div class="price-badge" th:text="${@currencyUtils.formatVnd(course.price)}">0 VNĐ</div>
                     </div>
                     <div class="card-body d-flex flex-column">
                         <h5 class="course-title" th:text="${course.title}" style="
@@ -674,54 +674,7 @@
         </div>
     </section>
 
-    <!-- ── FOOTER ── -->
-    <footer>
-        <div class="container">
-            <div class="row gy-5">
-                <div class="col-lg-4 col-md-12">
-                    <div class="footer-brand">
-                        <span>🎓</span> OnlineCourse
-                    </div>
-                    <p class="mb-4" style="line-height:1.7;">Chúng tôi cung cấp lộ trình học tập tối ưu, giúp bạn làm chủ công nghệ và phát triển sự nghiệp trong kỷ nguyên số.</p>
-                    <div>
-                        <a href="#" class="social-btn"><i class="bi bi-facebook"></i></a>
-                        <a href="#" class="social-btn"><i class="bi bi-youtube"></i></a>
-                        <a href="#" class="social-btn"><i class="bi bi-linkedin"></i></a>
-                        <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-6">
-                    <h6 class="text-white fw-bold mb-4" style="font-size:0.9rem;">Về chúng tôi</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#" class="footer-link">Giới thiệu</a></li>
-                        <li class="mb-2"><a href="#" class="footer-link">Liên hệ</a></li>
-                        <li class="mb-2"><a href="#" class="footer-link">Điều khoản</a></li>
-                        <li class="mb-2"><a href="#" class="footer-link">Bảo mật</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-2 col-md-4 col-6">
-                    <h6 class="text-white fw-bold mb-4" style="font-size:0.9rem;">Học tập</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="/courses" class="footer-link">Tất cả khóa học</a></li>
-                        <li class="mb-2"><a href="#" class="footer-link">Lộ trình học</a></li>
-                        <li class="mb-2"><a href="#" class="footer-link">Chứng chỉ</a></li>
-                        <li class="mb-2"><a href="#" class="footer-link">Hỏi đáp</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-4 col-md-4 col-12">
-                    <h6 class="text-white fw-bold mb-4" style="font-size:0.9rem;">Đăng ký nhận tin</h6>
-                    <p class="small mb-4" style="line-height:1.6;">Nhận thông tin về các khóa học mới nhất và mã giảm giá hấp dẫn.</p>
-                    <div class="d-flex gap-2">
-                        <input type="email" class="newsletter-input flex-grow-1" placeholder="Email của bạn">
-                        <button class="btn btn-newsletter" type="button">Gửi</button>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom text-center">
-                <p class="mb-0 small" style="opacity:0.5;">© 2026 OnlineCourse. Tất cả quyền được bảo lưu. Thiết kế bởi Antigravity.</p>
-            </div>
-        </div>
-    </footer>
+    <div th:replace="~{fragments/footer :: footer}"></div>
 
     <!-- Back to top -->
     <button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">

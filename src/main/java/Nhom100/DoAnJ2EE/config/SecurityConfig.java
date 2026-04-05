@@ -70,7 +70,8 @@ public class SecurityConfig {
                         "/js/**",                     // File JavaScript tĩnh
                         "/images/**",                 // File ảnh tĩnh
                         "/swagger-ui/**",              // Swagger UI
-                        "/v3/api-docs/**"             // OpenAPI JSON
+                        "/v3/api-docs/**",             // OpenAPI JSON
+                        "/vnpay/**"                    // VNPay payment (return & IPN)
                 ).permitAll()   // Cho phép tất cả mọi người truy cập
 
                 // 🚀 Endpoints dành riêng cho Admin (Trang web):

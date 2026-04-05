@@ -55,4 +55,9 @@ public interface OrderService {
      * Tìm đơn hàng theo ID
      */
     Order getOrderById(Long orderId);
+
+    /**
+     * Tìm đơn hàng theo mã thanh toán (VNPay)
+     */
+    Order getOrderByPaymentCode(String paymentCode);
 }

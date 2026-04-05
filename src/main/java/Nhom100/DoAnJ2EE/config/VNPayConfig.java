@@ -3,10 +3,7 @@ package Nhom100.DoAnJ2EE.config;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -17,10 +14,10 @@ import java.util.*;
 @Configuration
 public class VNPayConfig {
 
-    @Value("${vnpay.tmn-code:S4C3TCX2}")
+    @Value("${vnpay.tmn-code:UH7VZSEG}")
     private String vnp_TmnCode;
 
-    @Value("${vnpay.hash-secret:LQ92ZGVWZ8KMP1TD4OMQCLMAF8J5CL65}")
+    @Value("${vnpay.hash-secret:P7N7K14MN2F1NT0VPSNGW9W1GPCIAX84}")
     private String vnp_HashSecret;
 
     @Value("${vnpay.url:https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}")
@@ -29,66 +26,83 @@ public class VNPayConfig {
     @Value("${vnpay.return-url:http://localhost:8081/vnpay/return}")
     private String vnp_ReturnUrl;
 
-    private static final String VERSION    = "2.1.0";
-    private static final String COMMAND    = "pay";
+    private static final String VERSION = "2.1.0";
+    private static final String COMMAND = "pay";
     private static final String ORDER_TYPE = "other";
-    private static final String CURR_CODE  = "VND";
-    private static final String LOCALE     = "vn";
+    private static final String CURR_CODE = "VND";
+    private static final String LOCALE = "vn";
 
     /**
      * Tạo URL thanh toán VNPay
-     * Theo đúng format VNPay SDK: bỏ vnp_CreateDate, thêm vnp_BankCode
      */
     public String createPaymentUrl(long amount, String orderId,
-                                   String orderInfo, String ipAddress) {
-        // Dùng IPv4
+            String orderInfo, String ipAddress) {
+        // VNPay expects amount as VND * 100
+        long vnpAmount = amount * 100;
+
         String ip = ipAddress.contains(":") ? "127.0.0.1" : ipAddress;
 
-        // Params theo thứ tự VNPay SDK (không TreeMap)
-        // Hash: không có vnp_CreateDate, không có vnp_ReturnUrl
-        // Query: có tất cả params + vnp_ReturnUrl
-        Map<String, String> allParams = new LinkedHashMap<>();
-        allParams.put("vnp_Amount",    String.valueOf(amount));
-        allParams.put("vnp_Command",  COMMAND);
-        allParams.put("vnp_CurrCode",  CURR_CODE);
-        allParams.put("vnp_IpAddr",   ip);
-        allParams.put("vnp_Locale",    LOCALE);
-        allParams.put("vnp_OrderInfo", orderInfo);
-        allParams.put("vnp_OrderType", ORDER_TYPE);
-        allParams.put("vnp_TmnCode",  vnp_TmnCode);
-        allParams.put("vnp_TxnRef",    orderId);
-        allParams.put("vnp_Version",  VERSION);
+        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        String vnp_CreateDate = formatter.format(cld.getTime());
 
-        // Hash data: theo thứ tự LinkedHashMap, key=raw, val=raw
+        Map<String, String> vnp_Params = new HashMap<>();
+        vnp_Params.put("vnp_Version", VERSION);
+        vnp_Params.put("vnp_Command", COMMAND);
+        vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
+        vnp_Params.put("vnp_Amount", String.valueOf(vnpAmount));
+        vnp_Params.put("vnp_CurrCode", CURR_CODE);
+        // Omit vnp_BankCode if empty
+        vnp_Params.put("vnp_TxnRef", orderId);
+        vnp_Params.put("vnp_OrderInfo", orderInfo);
+        vnp_Params.put("vnp_OrderType", ORDER_TYPE);
+        vnp_Params.put("vnp_Locale", LOCALE);
+        vnp_Params.put("vnp_ReturnUrl", vnp_ReturnUrl);
+        vnp_Params.put("vnp_IpAddr", ip);
+        vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
+
+        List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
+        Collections.sort(fieldNames);
+
         StringBuilder hashData = new StringBuilder();
-        for (Map.Entry<String, String> e : allParams.entrySet()) {
-            hashData.append(e.getKey()).append('=').append(e.getValue()).append('&');
-        }
-        String hd = hashData.substring(0, hashData.length() - 1);
-
-        // Query string: key & val đều URL-encode
         StringBuilder query = new StringBuilder();
-        for (Map.Entry<String, String> e : allParams.entrySet()) {
-            query.append(urlEncode(e.getKey())).append('=')
-                 .append(urlEncode(e.getValue())).append('&');
+
+        for (int i = 0; i < fieldNames.size(); i++) {
+            String fieldName = fieldNames.get(i);
+            String fieldValue = vnp_Params.get(fieldName);
+
+            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+                // Build hash data & query string
+                // VNPay 2.1.0 requires URLEncode with %20 for spaces
+                String encodedKey = java.net.URLEncoder.encode(fieldName, StandardCharsets.UTF_8).replace("+", "%20");
+                String encodedVal = java.net.URLEncoder.encode(fieldValue, StandardCharsets.UTF_8).replace("+", "%20");
+
+                hashData.append(encodedKey).append('=').append(encodedVal);
+                query.append(encodedKey).append('=').append(encodedVal);
+
+                // Add separator if not the last item that was added
+                // Since some items are skipped if empty, we check if there are more valid items
+                // coming
+                // But easier is just to trim at the end if we have a trailing &
+                hashData.append('&');
+                query.append('&');
+            }
         }
-        // Thêm vnp_BankCode (rỗng) + vnp_ReturnUrl + vnp_Amount
-        query.append(urlEncode("vnp_BankCode")).append('=').append('&');
-        query.append(urlEncode("vnp_ReturnUrl")).append('=')
-             .append(urlEncode(vnp_ReturnUrl)).append('&');
-        query.append(urlEncode("vnp_Amount")).append('=')
-             .append(urlEncode(String.valueOf(amount)));
 
-        String queryString = query.toString();
-        String secureHash = hmacSHA512(vnp_HashSecret, hd);
+        // Remove trailing & if exists
+        String hd = hashData.toString();
+        if (hd.endsWith("&"))
+            hd = hd.substring(0, hd.length() - 1);
+        String qs = query.toString();
+        if (qs.endsWith("&"))
+            qs = qs.substring(0, qs.length() - 1);
 
-        System.err.println("[VNPay] hashData: " + hd);
-        System.err.println("[VNPay] SecureHash: " + secureHash);
+        String vnp_SecureHash = hmacSHA512(vnp_HashSecret, hd);
 
-        String url = vnp_Url + "?" + queryString + "&vnp_SecureHash=" + secureHash;
-        System.err.println("[VNPay] Final URL: " + url);
+        System.out.println("[VNPay Debug] HashData: " + hd);
+        System.out.println("[VNPay Debug] SecureHash: " + vnp_SecureHash);
 
-        return url;
+        return vnp_Url + "?" + qs + "&vnp_SecureHash=" + vnp_SecureHash;
     }
 
     /**
@@ -135,9 +149,9 @@ public class VNPayConfig {
         String hashData = data.substring(0, Math.max(0, data.length() - 1));
         String expected = hmacSHA512(vnp_HashSecret, hashData);
 
-        System.err.println("[VNPay] verify (decode=" + decodeValues + ") expected: " + expected);
-        System.err.println("[VNPay] verify (decode=" + decodeValues + ") received: " + receivedHash);
-        System.err.println("[VNPay] verify (decode=" + decodeValues + ") hashData: " + hashData);
+        System.err.println("[VNPay Debug] verify (decode=" + decodeValues + ") hashData: " + hashData);
+        System.err.println("[VNPay Debug] verify (decode=" + decodeValues + ") expected: " + expected);
+        System.err.println("[VNPay Debug] verify (decode=" + decodeValues + ") received: " + receivedHash);
 
         return expected.equalsIgnoreCase(receivedHash);
     }
@@ -147,8 +161,10 @@ public class VNPayConfig {
      */
     private String getField(Map<String, String> map, String key) {
         String val = map.get(key);
-        if (val == null) val = map.get(key.toLowerCase());
-        if (val == null) val = map.get(key.toUpperCase());
+        if (val == null)
+            val = map.get(key.toLowerCase());
+        if (val == null)
+            val = map.get(key.toUpperCase());
         return val;
     }
 
@@ -169,6 +185,7 @@ public class VNPayConfig {
     // ── Helpers ──
     /**
      * Chuyển số tiền sang VND (giá đã lưu trực tiếp là VND)
+     * 
      * @param amount số tiền đã nhân với exchange-rate
      * @return số tiền VND (long)
      */
@@ -195,14 +212,6 @@ public class VNPayConfig {
             return sb.toString();
         } catch (Exception e) {
             throw new RuntimeException("Lỗi HMAC SHA512", e);
-        }
-    }
-
-    private static String urlEncode(String value) {
-        try {
-            return URLEncoder.encode(value, StandardCharsets.UTF_8.toString()).replace("+", "%20");
-        } catch (UnsupportedEncodingException e) {
-            return value;
         }
     }
 

@@ -308,8 +308,13 @@ public class AdminController {
     }
 
     @GetMapping("/courses/delete/{id}")
-    public String deleteCourse(@PathVariable Long id) {
-        courseService.deleteCourse(id);
+    public String deleteCourse(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        try {
+            courseService.deleteCourse(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã xóa khóa học thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không thể xóa khóa học! Lỗi: " + e.getMessage());
+        }
         return "redirect:/admin/courses";
     }
 
@@ -481,10 +486,13 @@ public class AdminController {
     }
 
     @GetMapping("/categories/delete/{id}")
-    public String deleteCategory(@PathVariable Long id) {
-        // Lưu ý: Nếu danh mục có khóa học, hibernate sẽ báo lỗi hoặc xóa cascade tùy
-        // config
-        categoryRepository.deleteById(id);
+    public String deleteCategory(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        try {
+            categoryRepository.deleteById(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã xóa danh mục thành công! Các khóa học trong danh mục này hiện đã được chuyển về trạng thái 'Chưa phân loại'.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không thể xóa danh mục! Lỗi: " + e.getMessage());
+        }
         return "redirect:/admin/categories";
     }
 
@@ -519,8 +527,13 @@ public class AdminController {
     }
 
     @GetMapping("/users/delete/{id}")
-    public String deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+    public String deleteUser(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        try {
+            userService.deleteUser(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã xóa tài khoản người dùng vĩnh viễn thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không thể xóa người dùng! Lỗi: " + e.getMessage());
+        }
         return "redirect:/admin/users";
     }
 

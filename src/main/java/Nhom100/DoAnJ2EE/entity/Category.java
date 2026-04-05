@@ -14,7 +14,16 @@ public class Category {
 
     private String name;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "category")
     @JsonIgnore
     private List<Course> courses;
+
+    @PreRemove
+    private void preRemove() {
+        if (courses != null) {
+            for (Course course : courses) {
+                course.setCategory(null);
+            }
+        }
+    }
 }

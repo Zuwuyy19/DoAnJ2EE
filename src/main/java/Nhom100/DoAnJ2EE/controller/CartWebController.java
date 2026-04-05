@@ -36,16 +36,19 @@ public class CartWebController {
         boolean isLogged = user != null;
         String userDisplayName = null;
         String userHandle = null;
+        int cartItemCount = 0;
         if (isLogged) {
             isAdmin = auth.getAuthorities().stream()
                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
             userDisplayName = auth.getName();
             userHandle = "@" + auth.getName();
+            cartItemCount = cartService.getCartItemCount(user);
         }
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("isLogged", isLogged);
         model.addAttribute("userDisplayName", userDisplayName);
         model.addAttribute("userHandle", userHandle);
+        model.addAttribute("cartItemCount", cartItemCount);
     }
 
     @GetMapping

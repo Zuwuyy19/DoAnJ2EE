@@ -81,10 +81,10 @@
                                 </select>
                             </div>
                             <div class="col-md-6 text-start">
-                                <label class="form-label">Giá niêm yết (USD)</label>
+                                <label class="form-label">Giá niêm yết (VNĐ)</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0" style="border-radius: 12px 0 0 12px;">$</span>
-                                    <input type="number" step="0.01" th:field="*{price}" class="form-control border-start-0" placeholder="0.00" style="border-radius: 0 12px 12px 0;" required>
+                                    <span class="input-group-text bg-light border-end-0 fw-bold text-muted" style="border-radius: 12px 0 0 12px;">₫</span>
+                                    <input type="number" step="1000" th:field="*{price}" class="form-control border-start-0" placeholder="0" style="border-radius: 0 12px 12px 0;" required>
                                 </div>
                             </div>
                         </div>
